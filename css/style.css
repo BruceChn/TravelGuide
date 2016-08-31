@@ -41,6 +41,66 @@
   height:100%;
   z-index: 0;
 }
-input{
-  width:100%;
+
+#omnibox{
+    position:absolute:
+    top:0;
+    left:0;
+    margin:8px 0 8px 8px
 }
+.search{
+    position:relative;
+    background-color:#fff;
+    border-radius:2px;
+    width:392px;
+    height:48px;
+    border-bottom:1px solid transparent;
+    padding:12px 54px 11px 56px;
+}
+#searchinput{
+  width:282px;
+  height:24px !important;
+  border:none;
+  line-height: 24px;
+  font-size:15px;
+  vertical-align:top;
+
+}
+#searchinput:focus{
+    outline:none;
+}
+.searchmenu{
+    width:56px;
+    height:48px;
+    position: absolute;
+    top:0px;
+    left:0px;
+}
+.searchbtnbox{
+    position:absolute;
+    top:0px;
+    right:0px;
+    padding:12px 15px;
+    border:0;
+    background:transparent;
+}
+.searchbtnbox::before{
+    content:'';
+    display:block;
+    background:url(//maps.gstatic.com/tactile/omnibox/quantum_search_button-20150825-1x.png);
+    background-size: 72px 24px;
+    width:24px;
+    height:24px;
+    background-position:-24px 0;
+}
+.searchbtnbox.color1{
+
+}
+.searchbtnbox.color0{
+    background-position:0px 0;
+}
+
+/*.searchbox{
+    background:url("http://maps.gstatic.com/tactile/omnibox/quantum_search_button-20150825-1x.png") no-repeat scroll 7px 7px;
+    padding-left:30px;
+}*/

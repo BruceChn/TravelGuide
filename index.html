@@ -1,28 +1,46 @@
 <!DOCTYPE html>
 <html ng-app="myApp">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale =1" />
-  <link rel = "stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
-  <link rel = "stylesheet" href="css/style.css" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale =1" />
+    <link rel = "stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+    <link rel = "stylesheet" href="css/style.css" />
 
 
 </head>
 <body>
 <div class = "container">
-  <div id = "map" ng-controller="MapController as MapCtrl">
-  </div>
-  <div = "grid-container">
-    <div class = "grid_column">
-      <div class = "grid_column_item1">
-        <input type="text" ng-model = "model.location" />
-      </div>
-      <div class = "grid-column_item2">
-        <attractions></attractions>
-      </div>
-    </div>
-  </div>
+    <div id = "map" ng-controller="MapController as MapCtrl">
+        </div>
+    <div = "grid-container">
+        <div class = "grid_column">
+            <div class = "grid_column_item1">
+                <div id = "omnibox">
+                    <div class = "searchmenu">
 
+                    </div>
+                    <div class = "search">
+                        <input type = "text" id = "searchinput" />
+                        <button class = "searchbtnbox"></button>
+                    </div>
+
+                </div>
+
+
+
+
+
+
+
+
+                </div>
+
+            </div>
+            <div class = "grid-column_item2">
+                <attractions></attractions>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0e53B86tTI03YQGvN6gNA5s-MwTThHHY"></script>
