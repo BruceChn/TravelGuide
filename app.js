@@ -13,28 +13,54 @@ angular.module('myApp',[]);
         return{
           restrict:"E",
           scope:{},
-          controller:function($scope){
-              $scope.attractions = [{name:"a"},{name:"b"},{name:"c"},{name:"d"}];
-          },
+          controller:AttractionController,
+          controllerAs:'atCtrl',
+          bindToController:true,
           templateUrl:"templates/attraction.html"
         };
+    }
+    function AttractionController(location){
+        var vm = this;
+        vm.model = location;
+
     }
 })();
 
 (function(){
     'use strict';
-    angular.module('myApp')
+
+    angular
+        .module('myApp')
+        .factory('location',location);
+
+    function location(){
+        var initalInput = "";
+        var model={
+            searchInput:initalInput
+        };
+        return model;
+    }
+})();
+
+(function(){
+    'use strict';
+    angular
+        .module('myApp')
         .controller('MapController',MapController);
 
     //var map = new google.maps.Map(document.getElementById('map'),mapOptions);
-    function MapController($window){
+
+    MapController.$inject = ['$window','location'];
+
+    function MapController($window,location){
         var vm = this;
         var mapOptions = {
             center:{lat:37.397,lng:-121.644},
             zoom:11
         };
 
-
+        var input = location.searchInput;
+        console.log(input);
         vm.map = CreateMap(document.getElementById('map'),mapOptions);
         var infoWindow = new google.maps.InfoWindow({map: vm.map});
 
@@ -76,25 +102,24 @@ angular.module('myApp',[]);
         .directive('omnibox',OmniBox);
 
     function OmniBox(){
-        return{
+        var directive ={
             restrict:'E',
             scope:{},
-            templateUrl:"templates/omniBox.html"
+            templateUrl:"templates/omniBox.html",
+            controller:OmniboxController,
+            controllerAs:"obCtrl",
+            bindToController:true
         };
+        return directive;
     }
-})();
-
-(function(){
-    angular.module('myApp')
-    .controller('greeter', greeter);
-    function greeter() {
-
-        // ...
+    OmniboxController.$inject = ['location'];
+    function OmniboxController(location){
         var vm = this;
-        vm.getGreeting = function(name) {
-          return "Hello " + name;
-
-      };
-  }
-
+        vm.model = location;
+        vm.SearchAttraction = SearchAttraction;
+        
+        function SearchAttraction(input){
+            console.log(input);
+        }
+    }
 })();

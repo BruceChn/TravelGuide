@@ -11,10 +11,15 @@
         return{
           restrict:"E",
           scope:{},
-          controller:function($scope){
-              $scope.attractions = [{name:"a"},{name:"b"},{name:"c"},{name:"d"}];
-          },
+          controller:AttractionController,
+          controllerAs:'atCtrl',
+          bindToController:true,
           templateUrl:"templates/attraction.html"
         };
+    }
+    function AttractionController(location){
+        var vm = this;
+        vm.model = location;
+
     }
 })();

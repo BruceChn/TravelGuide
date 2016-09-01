@@ -1,17 +1,22 @@
 (function(){
     'use strict';
-    angular.module('myApp')
+    angular
+        .module('myApp')
         .controller('MapController',MapController);
 
     //var map = new google.maps.Map(document.getElementById('map'),mapOptions);
-    function MapController($window){
+
+    MapController.$inject = ['$window','location'];
+
+    function MapController($window,location){
         var vm = this;
         var mapOptions = {
             center:{lat:37.397,lng:-121.644},
             zoom:11
         };
 
-
+        var input = location.searchInput;
+        console.log(input);
         vm.map = CreateMap(document.getElementById('map'),mapOptions);
         var infoWindow = new google.maps.InfoWindow({map: vm.map});
 
