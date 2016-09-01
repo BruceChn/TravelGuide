@@ -1,4 +1,4 @@
-//attractions.js
+//attractions.directive.
 
 (function(){
     'use strict';
@@ -14,7 +14,7 @@
           controller:function($scope){
               $scope.attractions = [{name:"a"},{name:"b"},{name:"c"},{name:"d"}];
           },
-          templateUrl:"attraction.html",
+          templateUrl:"templates/attraction.html"
         };
     }
 })();

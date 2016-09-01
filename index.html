@@ -11,37 +11,21 @@
 <body>
 <div class = "container">
     <div id = "map" ng-controller="MapController as MapCtrl">
-        </div>
+    </div>
     <div = "grid-container">
         <div class = "grid_column">
             <div class = "grid_column_item1">
-                <div id = "omnibox">
-                    <div class = "searchmenu">
-
-                    </div>
-                    <div class = "search">
-                        <input type = "text" id = "searchinput" />
-                        <button class = "searchbtnbox"></button>
-                    </div>
-
-                </div>
-
-
-
-
-
-
-
-
-                </div>
-
+                <omnibox></omnibox>
             </div>
             <div class = "grid-column_item2">
                 <attractions></attractions>
+
             </div>
+
         </div>
     </div>
 </div>
+
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0e53B86tTI03YQGvN6gNA5s-MwTThHHY"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
@@ -49,8 +33,7 @@
 <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.js"></script>
 <script type="text/javascript" src="http://livejs.com/live.js"></script>
 <script src="http://angular-ui.github.io/ui-router/release/angular-ui-router.min.js"></script>
-<script src="js/app.module.js"></script>
-<script src="js/attractions.js"></script>
-<script src="js/mapCtrl.js"></script>
+<script src="app.js"></script>
+
 </body>
 </html>

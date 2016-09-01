@@ -1,3 +1,10 @@
+/*
+ *Ch01 - Grids
+ *Ch02 - Map Division
+ *Ch03 - Search Box
+*/
+
+/* Ch01 Grid */
 .container{
   padding-left:0px;
   padding-right:0px;
@@ -33,6 +40,8 @@
   height:90%;
   width:100%;
 }
+
+/* Ch-02 Map Division*/
 #map{
   position:absolute;
   top:0;
@@ -41,9 +50,9 @@
   height:100%;
   z-index: 0;
 }
-
+/* Ch03 Search box*/
 #omnibox{
-    position:absolute:
+    position:absolute;
     top:0;
     left:0;
     margin:8px 0 8px 8px
@@ -56,6 +65,9 @@
     height:48px;
     border-bottom:1px solid transparent;
     padding:12px 54px 11px 56px;
+}
+.search-shadow{
+    box-shadow:0 2px 4px rgba(0,0,0,0.2), 0 -1px 0px rgba(0,0,0,0.02);
 }
 #searchinput{
   width:282px;
@@ -75,6 +87,19 @@
     position: absolute;
     top:0px;
     left:0px;
+    padding:0px 0px;
+
+}
+#menubtn{
+    height:100%;
+    width:100%;
+    z-index: 2;
+    padding:0px 0px;
+    margin:0px 0px;
+    outline:none;
+}
+span{
+    z-index: 3;
 }
 .searchbtnbox{
     position:absolute;
@@ -83,6 +108,7 @@
     padding:12px 15px;
     border:0;
     background:transparent;
+    outline: none;
 }
 .searchbtnbox::before{
     content:'';
@@ -91,16 +117,15 @@
     background-size: 72px 24px;
     width:24px;
     height:24px;
+
+}
+.searchbtnbox.color1::before{
     background-position:-24px 0;
 }
-.searchbtnbox.color1{
-
+.searchbtnbox.color0:hover::before{
+    background-position:-24px 0;
 }
-.searchbtnbox.color0{
+.searchbtnbox.color0::before{
     background-position:0px 0;
-}
 
-/*.searchbox{
-    background:url("http://maps.gstatic.com/tactile/omnibox/quantum_search_button-20150825-1x.png") no-repeat scroll 7px 7px;
-    padding-left:30px;
-}*/
+}
