@@ -1,3 +1,5 @@
+//location.fact.js
+
 (function(){
     'use strict';
 
@@ -6,9 +8,8 @@
         .factory('location',location);
 
     function location(){
-        var initalInput = "";
         var model={
-            searchInput:initalInput
+            data:[]
         };
         return model;
     }

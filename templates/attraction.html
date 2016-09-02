@@ -1,6 +1,5 @@
-<!-- <ul>
-  <li ng-repeat = "attraction in atCtrl.model.searchInput">
+ <ul id = "attractionList">
+  <li ng-repeat = "attraction in atCtrl.model.data|nonagent|orderBy:'-rating'">
     {{attraction.name}}
   </li>
-</ul> -->
-<h1>{{atCtrl.model.searchInput}}</h1>
+</ul>

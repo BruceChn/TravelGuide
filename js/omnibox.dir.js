@@ -1,3 +1,5 @@
+//omnibox.dir.js
+
 (function(){
     angular
         .module('myApp')
@@ -14,14 +16,25 @@
         };
         return directive;
     }
-    OmniboxController.$inject = ['location'];
-    function OmniboxController(location){
+    OmniboxController.$inject = ['location','$http'];
+    function OmniboxController(location,$http){
         var vm = this;
         vm.model = location;
         vm.SearchAttraction = SearchAttraction;
-        
+
+
+
         function SearchAttraction(input){
-            console.log(input);
+
+            var url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=attraction+in+" +
+                input + "&key=AIzaSyB0e53B86tTI03YQGvN6gNA5s-MwTThHHY";
+            $http.get(url)
+                .then(function(response){
+                    vm.model.data = response.data.results;
+                    
+                },function(error){
+                    console.log(error);
+                });
         }
     }
 })();

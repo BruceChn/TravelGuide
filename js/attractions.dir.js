@@ -17,6 +17,8 @@
           templateUrl:"templates/attraction.html"
         };
     }
+
+    AttractionController.$inject = ['location'];
     function AttractionController(location){
         var vm = this;
         vm.model = location;

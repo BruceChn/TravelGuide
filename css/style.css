@@ -2,6 +2,7 @@
  *Ch01 - Grids
  *Ch02 - Map Division
  *Ch03 - Search Box
+ *Ch04 - AttractionList
 */
 
 /* Ch01 Grid */
@@ -9,6 +10,11 @@
   padding-left:0px;
   padding-right:0px;
   width:100%;
+}
+.grid_container{
+  display:-webkit-box;
+  display:-ms-flexbox;
+  display:flex;
 }
 .grid_column{
   position:absolute;
@@ -21,23 +27,18 @@
           flex-direction: column;
   flex-wrap:wrap;
   width:408px;
-
+  height:100%;
   z-index: 1;
 }
-
-.grid_container{
-  display:-webkit-box;
-  display:-ms-flexbox;
-  display:flex;
-}
-.grid_item1{
+.grid_column_item1{
   order:0;
-  height:10%;
+  height:56px;
   width:100%;
+  overflow:hidden;
 }
-.grid_item1{
+.grid_column_item2{
   order:1;
-  height:90%;
+  height:calc(100% - 56px);
   width:100%;
 }
 
@@ -127,5 +128,9 @@ span{
 }
 .searchbtnbox.color0::before{
     background-position:0px 0;
+
+}
+
+#AttractionList{
 
 }

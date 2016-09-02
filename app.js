@@ -19,12 +19,16 @@ angular.module('myApp',[]);
           templateUrl:"templates/attraction.html"
         };
     }
+
+    AttractionController.$inject = ['location'];
     function AttractionController(location){
         var vm = this;
         vm.model = location;
 
     }
 })();
+
+//location.fact.js
 
 (function(){
     'use strict';
@@ -34,14 +38,14 @@ angular.module('myApp',[]);
         .factory('location',location);
 
     function location(){
-        var initalInput = "";
         var model={
-            searchInput:initalInput
+            data:[]
         };
         return model;
     }
 })();
 
+//mapCtrl.ctrl.js
 (function(){
     'use strict';
     angular
@@ -60,7 +64,6 @@ angular.module('myApp',[]);
         };
 
         var input = location.searchInput;
-        console.log(input);
         vm.map = CreateMap(document.getElementById('map'),mapOptions);
         var infoWindow = new google.maps.InfoWindow({map: vm.map});
 
@@ -97,6 +100,34 @@ angular.module('myApp',[]);
 })();
 
 (function(){
+    'use strict';
+
+    angular
+        .module('myApp')
+        .filter('nonagent',nonAgent);
+
+    function nonAgent(){
+        return exCludeAgent;
+
+        function exCludeAgent(data){
+            var out = [];
+            for(var i = 0;i < data.length;i++)
+            {
+
+                if(data[i].types.indexOf("travel_agency") === -1)
+                {
+                    out.push(data[i]);
+                }
+            }
+
+            return out;
+        }
+    }
+})();
+
+//omnibox.dir.js
+
+(function(){
     angular
         .module('myApp')
         .directive('omnibox',OmniBox);
@@ -112,14 +143,25 @@ angular.module('myApp',[]);
         };
         return directive;
     }
-    OmniboxController.$inject = ['location'];
-    function OmniboxController(location){
+    OmniboxController.$inject = ['location','$http'];
+    function OmniboxController(location,$http){
         var vm = this;
         vm.model = location;
         vm.SearchAttraction = SearchAttraction;
-        
+
+
+
         function SearchAttraction(input){
-            console.log(input);
+
+            var url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=attraction+in+" +
+                input + "&key=AIzaSyB0e53B86tTI03YQGvN6gNA5s-MwTThHHY";
+            $http.get(url)
+                .then(function(response){
+                    vm.model.data = response.data.results;
+                    
+                },function(error){
+                    console.log(error);
+                });
         }
     }
 })();

@@ -1,3 +1,4 @@
+//mapCtrl.ctrl.js
 (function(){
     'use strict';
     angular
@@ -16,7 +17,6 @@
         };
 
         var input = location.searchInput;
-        console.log(input);
         vm.map = CreateMap(document.getElementById('map'),mapOptions);
         var infoWindow = new google.maps.InfoWindow({map: vm.map});
 
