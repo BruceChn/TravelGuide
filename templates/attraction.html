@@ -1,5 +1,12 @@
- <ul id = "attractionList">
+ <ul id = "attractionList" ng-if="atCtrl.model.isZeroData  === 2">
   <li ng-repeat = "attraction in atCtrl.model.data|nonagent|orderBy:'-rating'">
-    {{attraction.name}}
+    <attraction-section name = "{{attraction.name}}"></attraction-section>
   </li>
 </ul>
+<div id = "attractionList" ng-if = "atCtrl.model.isZeroData === 1">
+
+    <h2>Oops, we couldn't find the result based on your search. </h2>
+    <p>
+        Make sure your search is spelled correctly.
+    </p>
+</div>

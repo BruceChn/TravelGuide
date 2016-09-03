@@ -12,7 +12,8 @@
             templateUrl:"templates/omniBox.html",
             controller:OmniboxController,
             controllerAs:"obCtrl",
-            bindToController:true
+            bindToController:true,
+
         };
         return directive;
     }
@@ -21,9 +22,6 @@
         var vm = this;
         vm.model = location;
         vm.SearchAttraction = SearchAttraction;
-
-
-
         function SearchAttraction(input){
 
             var url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=attraction+in+" +
@@ -31,7 +29,8 @@
             $http.get(url)
                 .then(function(response){
                     vm.model.data = response.data.results;
-                    
+                    vm.model.isZeroData = (response.data.results.length === 0)?1:2;
+
                 },function(error){
                     console.log(error);
                 });

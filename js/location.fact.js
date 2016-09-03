@@ -9,7 +9,8 @@
 
     function location(){
         var model={
-            data:[]
+            data:[],
+            isZeroData:0 // 0: don't displya result 1: no return result  2: show results; 
         };
         return model;
     }

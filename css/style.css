@@ -32,14 +32,22 @@
 }
 .grid_column_item1{
   order:0;
-  height:56px;
+  height:64px;
   width:100%;
   overflow:hidden;
 }
+.grid_column_item1_searched{
+    background-color: #4285F4;
+}
+
 .grid_column_item2{
   order:1;
-  height:calc(100% - 56px);
+  height:calc(100% - 64px);
   width:100%;
+  overflow-y:auto;
+}
+.grid_column_item2_searched{
+    background-color:#fafafa;
 }
 
 /* Ch-02 Map Division*/
@@ -131,6 +139,45 @@ span{
 
 }
 
-#AttractionList{
+/* Ch04 AttractionList*/
 
+#attractionList{
+    list-style-type: none;
+    padding-left:0px;
+
+}
+#attractionList li{
+    background-color:#fafafa;
+}
+.attraction_section{
+    height:112px;
+    display:flex;
+    border-bottom:groove 1px #bababa;
+}
+.attraction_description{
+    width:80%;
+}
+.attraction_img{
+    width:20%;
+    height:100%;
+    background-image:url("//lh4.googleusercontent.com/-nVzTU4VbbXY/VM3TrQhDotI/AAAAAAAAATE/q2lOKr0Ub6ApT8NQulgWHJPb_T4Hb7wOg/w80-h92-p-k-no/");
+    background-repeat: no-repeat;
+}
+
+::-webkit-scrollbar-track
+{
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	border-radius: 10px;
+	background-color: #F5F5F5;
+}
+::-webkit-scrollbar
+{
+	width: 8px;
+	background-color: #F5F5F5;
+}
+::-webkit-scrollbar-thumb
+{
+
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	background-color: #555;
 }

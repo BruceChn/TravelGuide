@@ -12,14 +12,13 @@
 <div class = "container">
     <div id = "map" ng-controller="MapController as MapCtrl">
     </div>
-    <div = "grid-container">
+    <div = "grid-container" ng-controller="SearchController as SearchCtrl">
         <div class = "grid_column">
-            <div class = "grid_column_item1">
+            <div class = "grid_column_item1_searched grid_column_item1">
                 <omnibox></omnibox>
             </div>
-            <div class = "grid_column_item2">
+            <div ng-class = "['grid_column_item2',{'grid_column_item2_searched':SearchCtrl.model.isZeroData !== 0}]" >
                 <attractions></attractions>
-
             </div>
 
         </div>

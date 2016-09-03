@@ -28,6 +28,30 @@ angular.module('myApp',[]);
     }
 })();
 
+(function(){
+    'use strict';
+
+    angular
+        .module('myApp')
+        .directive('attractionSection',attractionSection);
+
+    function attractionSection(){
+        var directive = {
+            restrict:'E',
+            templateUrl:"templates/attractionSection.html",
+            scope:{
+                name:'@'
+            }
+            // controller:SectionController,
+            // controllerAs:SectCtrl,
+            // bindToController:true
+        };
+        return directive;
+
+
+    }
+})();
+
 //location.fact.js
 
 (function(){
@@ -39,7 +63,8 @@ angular.module('myApp',[]);
 
     function location(){
         var model={
-            data:[]
+            data:[],
+            isZeroData:0 // 0: don't displya result 1: no return result  2: show results; 
         };
         return model;
     }
@@ -139,7 +164,8 @@ angular.module('myApp',[]);
             templateUrl:"templates/omniBox.html",
             controller:OmniboxController,
             controllerAs:"obCtrl",
-            bindToController:true
+            bindToController:true,
+
         };
         return directive;
     }
@@ -148,9 +174,6 @@ angular.module('myApp',[]);
         var vm = this;
         vm.model = location;
         vm.SearchAttraction = SearchAttraction;
-
-
-
         function SearchAttraction(input){
 
             var url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=attraction+in+" +
@@ -158,10 +181,26 @@ angular.module('myApp',[]);
             $http.get(url)
                 .then(function(response){
                     vm.model.data = response.data.results;
-                    
+                    vm.model.isZeroData = (response.data.results.length === 0)?1:2;
+
                 },function(error){
                     console.log(error);
                 });
         }
+    }
+})();
+
+(function(){
+    'use strict';
+
+    angular
+        .module('myApp')
+        .controller('SearchController',SearchController);
+
+    SearchController.$inject = ['location'];
+    function SearchController(location){
+        var vm = this;
+        vm.model = location;
+
     }
 })();
