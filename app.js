@@ -40,12 +40,20 @@ angular.module('myApp',[]);
             restrict:'E',
             templateUrl:"templates/attractionSection.html",
             scope:{
-                name:'@'
-            }
+                name:'@',
+                rating:'@'
+            },
             // controller:SectionController,
             // controllerAs:SectCtrl,
             // bindToController:true
+            link:link
         };
+        function link(scope,element)
+        {
+            var css =  (scope.rating/5.0 * 65).toString() + 'px';
+            element.find("span.nonEmptyStars").css("width",css);
+
+        }
         return directive;
 
 
@@ -182,7 +190,6 @@ angular.module('myApp',[]);
                 .then(function(response){
                     vm.model.data = response.data.results;
                     vm.model.isZeroData = (response.data.results.length === 0)?1:2;
-
                 },function(error){
                     console.log(error);
                 });

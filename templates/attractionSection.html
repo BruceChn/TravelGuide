@@ -1,8 +1,16 @@
 <div class = "attraction_section">
     <div class = "attraction_description">
-        <h4>{{name}}</h4>
+        <div class = 'result-title-container'>
+            <h3><span class ="result-title">{{name}}</span></h3>
+            <span class = "result-rating">
+                <span class = "rating">{{rating|number:1}}</span>
+                <span class = "stars">
+                    <span class = "nonEmptyStars"></span>
+                </span>
+            </span>
+        </div>
+
     </div>
     <div class = "attraction_img">
-
     </div>
 </div>

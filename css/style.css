@@ -3,8 +3,12 @@
  *Ch02 - Map Division
  *Ch03 - Search Box
  *Ch04 - AttractionList
+ *Ch05 - ScrollerBar
 */
-
+@fontface
+html{
+    font-family:'Roboto', Arial, sans-serif;
+}
 /* Ch01 Grid */
 .container{
   padding-left:0px;
@@ -150,20 +154,59 @@ span{
     background-color:#fafafa;
 }
 .attraction_section{
-    height:112px;
+    min-height:112px;
     display:flex;
-    border-bottom:groove 1px #bababa;
+    border-bottom:solid 1px #e6e6e6;
+    padding:10px 18px 10px 24px;
+    cursor:pointer;
+}
+.attraction_section:hover{
+    background-color:#eee;
 }
 .attraction_description{
-    width:80%;
+    width:calc(100% - 80px);
 }
 .attraction_img{
-    width:20%;
-    height:100%;
+    width:80px;
     background-image:url("//lh4.googleusercontent.com/-nVzTU4VbbXY/VM3TrQhDotI/AAAAAAAAATE/q2lOKr0Ub6ApT8NQulgWHJPb_T4Hb7wOg/w80-h92-p-k-no/");
     background-repeat: no-repeat;
 }
+.result-title-container h3{
+    margin:0px 0px;
+}
+.result-title{
+    font-size :15px;
+    color: #000;
+    line-height: 16px;
+}
+.result-rating{
+    display:flex;
+}
+.rating{
+    font-size:13px;
+}
+.stars{
+    display:block;
 
+    background-image:url('../img/star-rating-sprite.png');
+    background-repeat:no-repeat;
+    background-position: 0 0px;
+    width:65px;
+    height:13px;
+    margin-left: 5px;
+    margin-top:1px;
+}
+.stars .nonEmptyStars{
+
+    display:inherit;
+    background-image:inherit;
+    background-repeat:inherit;
+
+    height:inherit;
+    background-position:0 -13px;
+
+}
+/*CH05 ScrollBar*/
 ::-webkit-scrollbar-track
 {
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);

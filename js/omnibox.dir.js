@@ -30,7 +30,6 @@
                 .then(function(response){
                     vm.model.data = response.data.results;
                     vm.model.isZeroData = (response.data.results.length === 0)?1:2;
-
                 },function(error){
                     console.log(error);
                 });
