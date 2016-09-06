@@ -10,12 +10,17 @@
     function Attractions(){
         return{
           restrict:"E",
-          scope:{},
+          scope:{
+              click:"&",
+              show:"="
+          },
           controller:AttractionController,
           controllerAs:'atCtrl',
           bindToController:true,
-          templateUrl:"templates/attraction.html"
+          templateUrl:"templates/attraction.html",
+
         };
+
     }
 
     AttractionController.$inject = ['location'];

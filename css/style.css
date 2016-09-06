@@ -4,12 +4,13 @@
  *Ch03 - Search Box
  *Ch04 - AttractionList
  *Ch05 - ScrollerBar
+ *Ch06 - ImgViewer
 */
 @fontface
 html{
     font-family:'Roboto', Arial, sans-serif;
 }
-/* Ch01 Grid */
+/* Ch01 Grid ######################################################################*/
 .container{
   padding-left:0px;
   padding-right:0px;
@@ -40,6 +41,13 @@ html{
   width:100%;
   overflow:hidden;
 }
+
+.grid_column_item1.ng-hide{
+    transform:translateX(-100%);
+}
+.grid_column_item1.ng-hide-add, .grid_column_item1.ng-hide-remove{
+    transition:0.2s linear all;
+}
 .grid_column_item1_searched{
     background-color: #4285F4;
 }
@@ -54,7 +62,7 @@ html{
     background-color:#fafafa;
 }
 
-/* Ch-02 Map Division*/
+/* Ch-02 Map Division##############################################################################################*/
 #map{
   position:absolute;
   top:0;
@@ -63,7 +71,7 @@ html{
   height:100%;
   z-index: 0;
 }
-/* Ch03 Search box*/
+/* Ch03 Search box##################################################################################################*/
 #omnibox{
     position:absolute;
     top:0;
@@ -143,12 +151,19 @@ span{
 
 }
 
-/* Ch04 AttractionList*/
+/* Ch04 AttractionList####################################################################################################################*/
 
 #attractionList{
     list-style-type: none;
     padding-left:0px;
 
+}
+#attractionList.ng-hide{
+
+    transform:translateX(-100%);
+}
+#attractionList.ng-hide-add, #attractionList.ng-hide-remove{
+    transition:0.2s linear all;
 }
 #attractionList li{
     background-color:#fafafa;
@@ -209,7 +224,25 @@ span{
     background-position:0 -13px;
 
 }
-/*CH05 ScrollBar*/
+
+.pane-toggle-button-container{
+    display:block !important;
+    position:absolute;
+    z-index:0;
+    top:8px;
+    left:100%;
+}
+.pane-toggle-button{
+    margin:0;
+    padding:0;
+    border:0;
+    outline:0;
+    width:23px;
+    height:48px;
+    cursor:pointer;
+    background: rgba(255,255,255,0.9) url("../img/show.png") 7px center/7px 10px no-repeat
+}
+/*CH05 ScrollBar################################################################################################*/
 ::-webkit-scrollbar-track
 {
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
@@ -228,7 +261,7 @@ span{
 	background-color: #555;
 }
 
-/*Ch06 imgViewer*/
+/*Ch06 imgViewer####################################################################################################*/
 .modal-body{
     padding:0px;
 }

@@ -14,12 +14,12 @@
     <div id = "map" ng-controller="MapController as MapCtrl">
     </div>
     <div = "grid-container" ng-controller="SearchController as SearchCtrl">
-        <div class = "grid_column">
-            <div class = "grid_column_item1_searched grid_column_item1">
+        <div class = "grid_column" >
+            <div ng-class = "['grid_column_item1',{'grid_column_item1_searched':SearchCtrl.model.isZeroData !== 0 && SearchCtrl.show}]"ng-show = "SearchCtrl.show">
                 <omnibox></omnibox>
             </div>
-            <div ng-class = "['grid_column_item2',{'grid_column_item2_searched':SearchCtrl.model.isZeroData !== 0}]" >
-                <attractions></attractions>
+            <div  ng-class = "['grid_column_item2',{'grid_column_item2_searched':SearchCtrl.model.isZeroData !== 0 && SearchCtrl.show}]">
+                <attractions click = "SearchCtrl.toggle()" show = "SearchCtrl.show"></attractions>
             </div>
 
         </div>
@@ -33,6 +33,7 @@
 <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.js"></script>
 <script type="text/javascript" src="http://livejs.com/live.js"></script>
 <script src="http://angular-ui.github.io/ui-router/release/angular-ui-router.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-animate.js"></script>
 <script src="app.js"></script>
 
 </body>
