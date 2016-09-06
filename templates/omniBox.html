@@ -5,7 +5,7 @@
         </button>
     </div>
     <div class = "search search-shadow">
-        <input type = "text" id = "searchinput" ng-model = "obCtrl.input" />
+        <input type = "text" id = "searchinput" ng-model = "obCtrl.input"  ng-keypress="obCtrl.input !== ''&&$event.keyCode==13 &&obCtrl.SearchAttraction(obCtrl.input)"/>
         <button class = "searchbtnbox color0" ng-click = "obCtrl.SearchAttraction(obCtrl.input)"></button>
     </div>
 </div>
