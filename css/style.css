@@ -166,11 +166,14 @@ span{
 .attraction_description{
     width:calc(100% - 80px);
 }
+
 .attraction_img{
     width:80px;
-    background-image:url("//lh4.googleusercontent.com/-nVzTU4VbbXY/VM3TrQhDotI/AAAAAAAAATE/q2lOKr0Ub6ApT8NQulgWHJPb_T4Hb7wOg/w80-h92-p-k-no/");
-    background-repeat: no-repeat;
 }
+.attraction_img{
+    cursor:zoom-in;
+}
+
 .result-title-container h3{
     margin:0px 0px;
 }
@@ -223,4 +226,14 @@ span{
 
 	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
 	background-color: #555;
+}
+
+/*Ch06 imgViewer*/
+.modal-body{
+    padding:0px;
+}
+.modal-body button{
+    position:absolute;
+    right:0px;
+    opacity:1;
 }

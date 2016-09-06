@@ -1,6 +1,6 @@
  <ul id = "attractionList" ng-if="atCtrl.model.isZeroData  === 2">
   <li ng-repeat = "attraction in atCtrl.model.data|nonagent|orderBy:'-rating'">
-    <attraction-section name = "{{attraction.name}}" rating = "{{attraction.rating}}" ></attraction-section>
+    <attraction-section name = "{{attraction.name}}" rating = "{{attraction.rating}}" index = "{{$index}}"></attraction-section>
   </li>
 </ul>
 <div id = "attractionList" ng-if = "atCtrl.model.isZeroData === 1">
