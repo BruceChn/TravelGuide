@@ -1,5 +1,114 @@
 angular.module('myApp',['ngAnimate']);
 
+//mapCtrl.ctrl.js
+(function(){
+    'use strict';
+    angular
+        .module('myApp')
+        .controller('MapController',MapController);
+
+    //var map = new google.maps.Map(document.getElementById('map'),mapOptions);
+
+    MapController.$inject = ['$window','location'];
+
+    function MapController($window,location){
+        var vm = this;
+        var mapOptions = {
+            center:{lat:37.397,lng:-121.644},
+            zoom:11
+        };
+
+        var input = location.searchInput;
+        vm.map = CreateMap(document.getElementById('map'),mapOptions);
+        var infoWindow = new google.maps.InfoWindow({map: vm.map});
+
+        if ($window.navigator.geolocation) {
+             $window.navigator.geolocation.getCurrentPosition(function(position) {
+                var pos = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+
+                infoWindow.setPosition(pos);
+                infoWindow.setContent('Current Location');
+                vm.map.setCenter(pos);
+            }, function() {
+                handleLocationError(true, infoWindow, vm.map.getCenter());
+            });
+        } else {
+        // Browser doesn't support Geolocation
+            handleLocationError(false, infoWindow, vm.map.getCenter());
+        }
+
+
+        function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+            infoWindow.setPosition(pos);
+            infoWindow.setContent(browserHasGeolocation ?
+                'Error: The Geolocation service failed.' :
+                'Error: Your browser doesn\'t support geolocation.');
+        }
+        function CreateMap(element,options)
+        {
+            return new google.maps.Map(element,options);
+        }
+    }
+})();
+
+(function(){
+    'use strict';
+
+    angular
+        .module('myApp')
+        .controller('SearchController',SearchController);
+
+    SearchController.$inject = ['location'];
+    function SearchController(location){
+        var vm = this;
+        vm.model = location;
+        vm.show = true;
+        vm.toggle = toggle;
+
+        function toggle(){
+            vm.show = !vm.show;
+            var button = angular.element('.pane-toggle-button');
+            if(!vm.show)
+            {
+                angular.element('.pane-toggle-button-container').css('left','0px');
+
+                button.css('transform','scaleX(-1)');
+                button.attr('data-original-title','expand side pane');
+
+            }
+            else
+            {
+                angular.element('.pane-toggle-button-container').css('left','100%');
+                button.css('transform','scaleX(1)');
+                button.attr('data-original-title','collapse side pane');
+
+            }
+        }
+
+    }
+})();
+
+//location.fact.js
+
+(function(){
+    'use strict';
+
+    angular
+        .module('myApp')
+        .factory('location',location);
+
+    function location(){
+        var model={
+            data:[],
+            isZeroData:0 // 0: don't displya result 1: no return result  2: show results; 
+        };
+        return model;
+    }
+})();
+
 //attractions.directive.
 
 (function(){
@@ -21,6 +130,7 @@ angular.module('myApp',['ngAnimate']);
           bindToController:true,
           templateUrl:"templates/attraction.html",
 
+
         };
 
     }
@@ -29,6 +139,7 @@ angular.module('myApp',['ngAnimate']);
     function AttractionController(location){
         var vm = this;
         vm.model = location;
+
 
     }
 })();
@@ -127,108 +238,6 @@ angular.module('myApp',['ngAnimate']);
 
 })();
 
-//location.fact.js
-
-(function(){
-    'use strict';
-
-    angular
-        .module('myApp')
-        .factory('location',location);
-
-    function location(){
-        var model={
-            data:[],
-            isZeroData:0 // 0: don't displya result 1: no return result  2: show results; 
-        };
-        return model;
-    }
-})();
-
-//mapCtrl.ctrl.js
-(function(){
-    'use strict';
-    angular
-        .module('myApp')
-        .controller('MapController',MapController);
-
-    //var map = new google.maps.Map(document.getElementById('map'),mapOptions);
-
-    MapController.$inject = ['$window','location'];
-
-    function MapController($window,location){
-        var vm = this;
-        var mapOptions = {
-            center:{lat:37.397,lng:-121.644},
-            zoom:11
-        };
-
-        var input = location.searchInput;
-        vm.map = CreateMap(document.getElementById('map'),mapOptions);
-        var infoWindow = new google.maps.InfoWindow({map: vm.map});
-
-        if ($window.navigator.geolocation) {
-             $window.navigator.geolocation.getCurrentPosition(function(position) {
-                var pos = {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
-                };
-
-                infoWindow.setPosition(pos);
-                infoWindow.setContent('Current Location');
-                vm.map.setCenter(pos);
-            }, function() {
-                handleLocationError(true, infoWindow, vm.map.getCenter());
-            });
-        } else {
-        // Browser doesn't support Geolocation
-            handleLocationError(false, infoWindow, vm.map.getCenter());
-        }
-
-
-        function handleLocationError(browserHasGeolocation, infoWindow, pos) {
-            infoWindow.setPosition(pos);
-            infoWindow.setContent(browserHasGeolocation ?
-                'Error: The Geolocation service failed.' :
-                'Error: Your browser doesn\'t support geolocation.');
-        }
-        function CreateMap(element,options)
-        {
-            return new google.maps.Map(element,options);
-        }
-    }
-})();
-
-//nonAgent.filter.js
-
-// filter used to eliminate the travel_agency results from google search
-//update: used it to eliminate non-rating results also
-(function(){
-    'use strict';
-
-    angular
-        .module('myApp')
-        .filter('nonagent',nonAgent);
-
-    function nonAgent(){
-        return exCludeAgent;
-
-        function exCludeAgent(data){
-            var out = [];
-            for(var i = 0;i < data.length;i++)
-            {
-
-                if(data[i].types.indexOf("travel_agency") === -1 && ('rating' in data[i]))
-                {
-                    out.push(data[i]);
-                }
-            }
-
-            return out;
-        }
-    }
-})();
-
 //omnibox.dir.js
 
 (function(){
@@ -245,14 +254,17 @@ angular.module('myApp',['ngAnimate']);
             controllerAs:"obCtrl",
             bindToController:true,
 
+
         };
         return directive;
+
     }
     OmniboxController.$inject = ['location','$http'];
     function OmniboxController(location,$http){
         var vm = this;
         vm.model = location;
         vm.SearchAttraction = SearchAttraction;
+
         function randomString(length, chars) {
                 var result = '';
                 for (var i = length; i > 0; --i) result += chars[Math.round(Math.random() * (chars.length - 1))];
@@ -260,15 +272,19 @@ angular.module('myApp',['ngAnimate']);
         }
         function SearchAttraction(input){
 
-            var url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=attraction+in+" +
-                input + "&key=AIzaSyB0e53B86tTI03YQGvN6gNA5s-MwTThHHY";
-            $http.get(url)
-                .then(function(response){
-                    vm.model.data = response.data.results;
-                    vm.model.isZeroData = (response.data.results.length === 0)?1:2;
-                },function(error){
-                    console.log(error);
-                });
+            if(input !== '' && input !== undefined)
+            {
+
+                var url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=attraction+in+" +
+                    input + "&key=AIzaSyB0e53B86tTI03YQGvN6gNA5s-MwTThHHY";
+                $http.get(url)
+                    .then(function(response){
+                        vm.model.data = response.data.results;
+                        vm.model.isZeroData = (response.data.results.length === 0)?1:2;
+                    },function(error){
+                        console.log(error);
+                    });
+            }
             // var options = {
             //     encodeSignature: true // will encode the signature following the RFC 3986 Spec by default
             // };
@@ -300,31 +316,54 @@ angular.module('myApp',['ngAnimate']);
 
 (function(){
     'use strict';
+    angular
+        .module('myApp')
+        .directive('tooltip', function(){
+            var directive = {
+
+                restrict: 'A',
+                link:link
+            };
+            return directive;
+            function link(scope,element){
+                    $(element).hover(function(){
+                        // on mouseenter
+                        $(element).tooltip('show');
+                    }, function(){
+                        // on mouseleave
+                        $(element).tooltip('hide');
+                    });
+
+            }
+        });
+})();
+
+//nonAgent.filter.js
+
+// filter used to eliminate the travel_agency results from google search
+//update: used it to eliminate non-rating results also
+(function(){
+    'use strict';
 
     angular
         .module('myApp')
-        .controller('SearchController',SearchController);
+        .filter('nonagent',nonAgent);
 
-    SearchController.$inject = ['location'];
-    function SearchController(location){
-        var vm = this;
-        vm.model = location;
-        vm.show = true;
-        vm.toggle = toggle;
+    function nonAgent(){
+        return exCludeAgent;
 
-        function toggle(){
-            vm.show = !vm.show;
-            if(!vm.show)
+        function exCludeAgent(data){
+            var out = [];
+            for(var i = 0;i < data.length;i++)
             {
-                angular.element('.pane-toggle-button-container').css('left','0px');
-                angular.element('.pane-toggle-button').css('transform','scaleX(-1)');
+
+                if(data[i].types.indexOf("travel_agency") === -1 && ('rating' in data[i]))
+                {
+                    out.push(data[i]);
+                }
             }
-            else
-            {
-                angular.element('.pane-toggle-button-container').css('left','100%');
-                angular.element('.pane-toggle-button').css('transform','scaleX(1)');
-            }
+
+            return out;
         }
-
     }
 })();

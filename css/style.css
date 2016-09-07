@@ -242,6 +242,9 @@ span{
     cursor:pointer;
     background: rgba(255,255,255,0.9) url("../img/show.png") 7px center/7px 10px no-repeat
 }
+.pane-toggle-button + .tooltip.right > .tooltip-inner{
+    white-space: nowrap;
+}
 /*CH05 ScrollBar################################################################################################*/
 ::-webkit-scrollbar-track
 {

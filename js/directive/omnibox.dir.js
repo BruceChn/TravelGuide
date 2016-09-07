@@ -14,14 +14,17 @@
             controllerAs:"obCtrl",
             bindToController:true,
 
+
         };
         return directive;
+
     }
     OmniboxController.$inject = ['location','$http'];
     function OmniboxController(location,$http){
         var vm = this;
         vm.model = location;
         vm.SearchAttraction = SearchAttraction;
+
         function randomString(length, chars) {
                 var result = '';
                 for (var i = length; i > 0; --i) result += chars[Math.round(Math.random() * (chars.length - 1))];
@@ -29,15 +32,19 @@
         }
         function SearchAttraction(input){
 
-            var url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=attraction+in+" +
-                input + "&key=AIzaSyB0e53B86tTI03YQGvN6gNA5s-MwTThHHY";
-            $http.get(url)
-                .then(function(response){
-                    vm.model.data = response.data.results;
-                    vm.model.isZeroData = (response.data.results.length === 0)?1:2;
-                },function(error){
-                    console.log(error);
-                });
+            if(input !== '' && input !== undefined)
+            {
+
+                var url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=attraction+in+" +
+                    input + "&key=AIzaSyB0e53B86tTI03YQGvN6gNA5s-MwTThHHY";
+                $http.get(url)
+                    .then(function(response){
+                        vm.model.data = response.data.results;
+                        vm.model.isZeroData = (response.data.results.length === 0)?1:2;
+                    },function(error){
+                        console.log(error);
+                    });
+            }
             // var options = {
             //     encodeSignature: true // will encode the signature following the RFC 3986 Spec by default
             // };

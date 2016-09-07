@@ -19,6 +19,7 @@
           bindToController:true,
           templateUrl:"templates/attraction.html",
 
+
         };
 
     }
@@ -27,6 +28,7 @@
     function AttractionController(location){
         var vm = this;
         vm.model = location;
+
 
     }
 })();

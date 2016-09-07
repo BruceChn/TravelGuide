@@ -18,7 +18,7 @@ module.exports = function(config) {
       'google-map-api.js',
 	  'node_modules/angular/angular.js',
 	  'node_modules/angular-mocks/angular-mocks.js',
-      'js/**.js',
+      'js/**/*.js',
       'tests/**.test.js'
     ],
 
