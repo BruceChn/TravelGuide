@@ -1,8 +1,28 @@
+
  <ul id = "attractionList" ng-if="atCtrl.model.isZeroData  === 2" ng-show = "atCtrl.show">
-  <li ng-repeat = "attraction in atCtrl.model.data|nonagent|orderBy:'-rating'">
-    <attraction-section name = "{{attraction.name}}" rating = "{{attraction.rating}}" index = "{{$index}}"></attraction-section>
-  </li>
+    <li ng-repeat = "attraction in ($parent.results[$parent.model.currentIndex] = (atCtrl.model.data|nonagent|orderBy:'-rating'))">
+        <attraction-section name = "{{attraction.name}}" rating = "{{attraction.rating}}" index = "{{$index}}"></attraction-section>
+    </li>
+    <li ng-if="results[model.currentIndex].length === 0">
+        <h2>Oops, there are no more results that match your search</h2>
+        <p>
+            Please go back to previous page
+        </p>
+    </li>
 </ul>
+<div class ="pane-section-pagination">
+    <div class = "pane-section-pagination-right" ng-cloak>
+        Showing results {{currentStart}} - {{results[model.currentIndex].length + currentStart - 1}}
+        <button class = "pane-section-pagination-button" id = "pane-section-pagination-button-prev">
+            <span class = "pane-section-pagination-prev" ng-click="previous()"></span>
+        </button>
+        <button ng-class = "['pane-section-pagination-button',{'pane-section-pagination-button-disabled':model.currentIndex === (results.length - 1) && model.nextPageToken === ''}]" id = "pane-section-pagination-button-next">
+            <span class = "pane-section-pagination-next" ng-click="next()"></span>
+        </button>
+
+    </div>
+
+</div>
 <div id = "attractionList" ng-if = "atCtrl.model.isZeroData === 1" ng-show = "atCtrl.show">
 
     <h2>Oops, we couldn't find the result based on your search. </h2>

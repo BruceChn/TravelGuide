@@ -19,7 +19,9 @@
                 <omnibox></omnibox>
             </div>
             <div  ng-class = "['grid_column_item2',{'grid_column_item2_searched':SearchCtrl.model.isZeroData !== 0 && SearchCtrl.show}]">
-                <attractions click = "SearchCtrl.toggle()" show = "SearchCtrl.show"></attractions>
+                <attractions click = "SearchCtrl.toggle()" show = "SearchCtrl.show" class = "attractions-container"></attractions>
+            </div>
+            <div class = "section-refresh-overlay">
             </div>
 
         </div>

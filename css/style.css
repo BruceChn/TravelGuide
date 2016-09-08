@@ -10,6 +10,9 @@
 html{
     font-family:'Roboto', Arial, sans-serif;
 }
+html,body{
+    height:100%;
+}
 /* Ch01 Grid ######################################################################*/
 .container{
   padding-left:0px;
@@ -56,10 +59,23 @@ html{
   order:1;
   height:calc(100% - 64px);
   width:100%;
-  overflow-y:auto;
+
 }
 .grid_column_item2_searched{
     background-color:#fafafa;
+}
+
+.section-refresh-overlay{
+    pointer-events: none;
+    opacity:0.35;
+    background-color:#000;
+    visibility:hidden;
+    position:absolute;
+    top:65px;
+    bottom:0px;
+    left:0px;
+    right:0px;
+    z-index:5;
 }
 
 /* Ch-02 Map Division##############################################################################################*/
@@ -134,7 +150,7 @@ span{
 .searchbtnbox::before{
     content:'';
     display:block;
-    background:url(//maps.gstatic.com/tactile/omnibox/quantum_search_button-20150825-1x.png);
+    background:url("../img/search-button.png");
     background-size: 72px 24px;
     width:24px;
     height:24px;
@@ -142,6 +158,9 @@ span{
 }
 .searchbtnbox.color1::before{
     background-position:-24px 0;
+}
+.searchbtnbox.changed::before{
+    background:url("../img/spinner_color.gif");
 }
 .searchbtnbox.color0:hover::before{
     background-position:-24px 0;
@@ -156,7 +175,9 @@ span{
 #attractionList{
     list-style-type: none;
     padding-left:0px;
-
+    margin-bottom:0px;
+    height:calc(100% - 43px);
+    overflow-y:auto;
 }
 #attractionList.ng-hide{
 
@@ -245,6 +266,57 @@ span{
 .pane-toggle-button + .tooltip.right > .tooltip-inner{
     white-space: nowrap;
 }
+.pane-section-pagination{
+    border:1px solid #e6e6e6;
+    padding:11px 18px 13px;
+    height:43px;
+    width:408px;
+}
+.pane-section-pagination-right{
+    float:right;
+    color:#8c8c8c;
+    font-size:12px;
+    line-height:18px;
+    text-align:left;
+}
+.pane-section-pagination-button{
+    cursor:pointer;
+    margin-left:14px;
+    padding-left:4px;
+    padding-right:4px;
+
+    vertical-align: baseline;
+    background: transparent;
+    width:17px;
+    height:18px;
+    border:0px;
+    outline:0px;
+}
+.pane-section-pagination-prev{
+    background-image: url("../img/arrow.png");
+    background-size:20px 16px;
+    height:16px;
+    margin-top:2px;
+    vertical-align:top;
+    width:9px;
+    cursor:pointer;
+    display:inline-block;
+}
+.pane-section-pagination-next{
+    background-image: url("../img/arrow.png");
+    background-size:20px 16px;
+    background-position: -11px 0px;
+    height:16px;
+    margin-top:2px;
+    vertical-align:top;
+    width:9px;
+    cursor:pointer;
+    display:inline-block;
+}
+.pane-section-pagination-button-disabled{
+    pointer-events:none;
+    opacity:0.38;
+}
 /*CH05 ScrollBar################################################################################################*/
 ::-webkit-scrollbar-track
 {
@@ -256,12 +328,14 @@ span{
 {
 	width: 8px;
 	background-color: #F5F5F5;
+
 }
 ::-webkit-scrollbar-thumb
 {
 
 	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
 	background-color: #555;
+    border-radius: 10px;
 }
 
 /*Ch06 imgViewer####################################################################################################*/
