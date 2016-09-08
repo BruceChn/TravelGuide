@@ -1,96 +1,5 @@
 angular.module('myApp',['ngAnimate']);
 
-//mapCtrl.ctrl.js
-(function(){
-    'use strict';
-    angular
-        .module('myApp')
-        .controller('MapController',MapController);
-
-    //var map = new google.maps.Map(document.getElementById('map'),mapOptions);
-
-    MapController.$inject = ['$window','location'];
-
-    function MapController($window,location){
-        var vm = this;
-        var mapOptions = {
-            center:{lat:37.397,lng:-121.644},
-            zoom:11
-        };
-
-        var input = location.searchInput;
-        vm.map = CreateMap(document.getElementById('map'),mapOptions);
-        var infoWindow = new google.maps.InfoWindow({map: vm.map});
-
-        if ($window.navigator.geolocation) {
-             $window.navigator.geolocation.getCurrentPosition(function(position) {
-                var pos = {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
-                };
-
-                infoWindow.setPosition(pos);
-                infoWindow.setContent('Current Location');
-                vm.map.setCenter(pos);
-            }, function() {
-                handleLocationError(true, infoWindow, vm.map.getCenter());
-            });
-        } else {
-        // Browser doesn't support Geolocation
-            handleLocationError(false, infoWindow, vm.map.getCenter());
-        }
-
-
-        function handleLocationError(browserHasGeolocation, infoWindow, pos) {
-            infoWindow.setPosition(pos);
-            infoWindow.setContent(browserHasGeolocation ?
-                'Error: The Geolocation service failed.' :
-                'Error: Your browser doesn\'t support geolocation.');
-        }
-        function CreateMap(element,options)
-        {
-            return new google.maps.Map(element,options);
-        }
-    }
-})();
-
-(function(){
-    'use strict';
-
-    angular
-        .module('myApp')
-        .controller('SearchController',SearchController);
-
-    SearchController.$inject = ['location'];
-    function SearchController(location){
-        var vm = this;
-        vm.model = location;
-        vm.show = true;
-        vm.toggle = toggle;
-
-        function toggle(){
-            vm.show = !vm.show;
-            var button = angular.element('.pane-toggle-button');
-            if(!vm.show)
-            {
-                angular.element('.pane-toggle-button-container').css('left','0px');
-
-                button.css('transform','scaleX(-1)');
-                button.attr('data-original-title','expand side pane');
-
-            }
-            else
-            {
-                angular.element('.pane-toggle-button-container').css('left','100%');
-                button.css('transform','scaleX(1)');
-                button.attr('data-original-title','collapse side pane');
-
-            }
-        }
-
-    }
-})();
-
 //attractions.directive.
 
 (function(){
@@ -100,8 +9,8 @@ angular.module('myApp',['ngAnimate']);
         .directive("attractions",Attractions);
 
     // define attractions directive
-    Attractions.$inject = ['location','$http'];
-    function Attractions(location){
+    Attractions.$inject = ['location','$rootScope','$filter'];
+    function Attractions(location,$rootScope,$filter){
         return{
           restrict:"E",
           scope:{
@@ -120,8 +29,12 @@ angular.module('myApp',['ngAnimate']);
             scope.currentStart = 1;
             scope.previous = previous;
             scope.next = next;
+            scope.animate = animate;
+            scope.stopAnimate = stopAnimate;
+            scope.model.data = scope.results[scope.model.currentIndex];
             activate();
             function activate(){
+                // if in the first page , disable the previous button
                 if(scope.model.currentIndex === 0)
                 {
                     element.find('button#pane-section-pagination-button-prev').addClass('pane-section-pagination-button-disabled');
@@ -131,6 +44,7 @@ angular.module('myApp',['ngAnimate']);
                 }
 
             }
+            //watch if in the first page
             scope.$watch('model.currentIndex',function(newValue, oldValue, scope){
                 if(newValue === 0)
                 {
@@ -141,15 +55,18 @@ angular.module('myApp',['ngAnimate']);
                 }
             },true);
 
+
+            // go to the previous page
             function previous(){
                 scope.model.currentIndex--;
                 scope.model.data = scope.results[scope.model.currentIndex];
-
                 scope.currentStart = scope.currentStart - scope.results[scope.model.currentIndex].length;
+                $rootScope.$emit('setMarkers',{data:$filter('orderBy')($filter('nonagent')(location.data),'-rating')});
             }
+            // go to the next page
             function next(){
 
-
+                // if in the last page, then go to the new page needs http request
                 if(scope.model.currentIndex === (scope.results.length - 1))
                 {
                     angular.element('div.section-refresh-overlay').css('visibility','visible');
@@ -158,6 +75,7 @@ angular.module('myApp',['ngAnimate']);
 
                         scope.currentStart += scope.results[scope.model.currentIndex - 1].length;
                         angular.element('div.section-refresh-overlay').css('visibility','hidden');
+                        $rootScope.$emit('setMarkers',{data:$filter('orderBy')($filter('nonagent')(location.data),'-rating')});
 
                     },function(error){
                         console.log(error);
@@ -167,9 +85,14 @@ angular.module('myApp',['ngAnimate']);
                     scope.model.currentIndex++;
                     scope.model.data = scope.results[scope.model.currentIndex];
                     scope.currentStart += scope.results[scope.model.currentIndex - 1].length;
+                    $rootScope.$emit('setMarkers',{data:$filter('orderBy')($filter('nonagent')(location.data),'-rating')});
                 }
-
-
+            }
+            function animate(index){
+                $rootScope.$emit('setAnimation',{index:index});
+            }
+            function stopAnimate(index){
+                $rootScope.$emit('stopAnimation',{index:index})
             }
 
         }
@@ -181,6 +104,8 @@ angular.module('myApp',['ngAnimate']);
         vm.model = location;
     }
 })();
+
+/*attractionSection.dir.js*/
 
 (function(){
     'use strict';
@@ -255,6 +180,7 @@ angular.module('myApp',['ngAnimate']);
 
 })();
 
+/*imgViewer.dir.js*/
 (function(){
     'use strict';
 
@@ -283,8 +209,8 @@ angular.module('myApp',['ngAnimate']);
         .module('myApp')
         .directive('omnibox',OmniBox);
 
-    OmniBox.$inject = ['location'];
-    function OmniBox(location){
+    OmniBox.$inject = ['location','$rootScope','$filter'];
+    function OmniBox(location,$rootScope,$filter){
         var directive ={
             restrict:'E',
             scope:{},
@@ -306,9 +232,11 @@ angular.module('myApp',['ngAnimate']);
                 {
                     vm.model.currentIndex = 0;
                     var promise = location.search(input);
+
                     element.find('button.searchbtnbox').toggleClass('changed');
                     promise.then(function(){
                         element.find('button.searchbtnbox').toggleClass('changed');
+                        $rootScope.$emit('setMarkers',{data:$filter('orderBy')($filter('nonagent')(location.data),'-rating')});
                     },function(error){
                         console.log(error);
                     });
@@ -318,32 +246,8 @@ angular.module('myApp',['ngAnimate']);
         }
     }
 })();
-    // OmniboxController.$inject = ['location','$http'];
-    // function OmniboxController(location,$http){
-    //     var vm = this;
-    //     vm.model = location;
-    //     vm.SearchAttraction = SearchAttraction;
-    //
-    //     function randomString(length, chars) {
-    //             var result = '';
-    //             for (var i = length; i > 0; --i) result += chars[Math.round(Math.random() * (chars.length - 1))];
-    //             return result;
-    //     }
-    //     function SearchAttraction(input){
-    //
-    //         if(input !== '' && input !== undefined)
-    //         {
-    //             vm.model.currentIndex = 0;
-    //             var promise = location.search(input);
-    //             console.log(promise);
-    //             // var promise = location.search(input);
-    //             // console.log(promise);
-    //             // promise.then(function(response){
-    //             //     console.log("ishere");
-    //             // },function(error){
-    //             //     console.log(error);
-    //             // });
-    //         }
+
+
     //         // var options = {
     //         //     encodeSignature: true // will encode the signature following the RFC 3986 Spec by default
     //         // };
@@ -372,6 +276,8 @@ angular.module('myApp',['ngAnimate']);
     //     }
     // }
 
+/*tooltip.js*/
+
 (function(){
     'use strict';
     angular
@@ -396,33 +302,139 @@ angular.module('myApp',['ngAnimate']);
         });
 })();
 
-//nonAgent.filter.js
+//mapCtrl.ctrl.js
+(function(){
+    'use strict';
+    angular
+        .module('myApp')
+        .controller('MapController',MapController);
 
-// filter used to eliminate the travel_agency results from google search
-//update: used it to eliminate non-rating results also
+    //var map = new google.maps.Map(document.getElementById('map'),mapOptions);
+
+    MapController.$inject = ['$window','location','$rootScope'];
+
+    function MapController($window,location,$rootScope){
+        var vm = this;
+        var mapOptions = {
+            center:{lat:37.397,lng:-121.644},
+            zoom:11
+        };
+
+        vm.model = location;
+        vm.markers = [];
+        vm.setMarkers = setMarkers;
+        vm.setAnimation = setAnimation;
+        vm.stopAnimation = stopAnimation;
+        vm.map = CreateMap(document.getElementById('map'),mapOptions);
+        var infoWindow = new google.maps.InfoWindow({map: vm.map});
+
+        if ($window.navigator.geolocation) {
+             $window.navigator.geolocation.getCurrentPosition(function(position) {
+                var pos = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+
+
+                vm.map.setCenter(pos);
+            }, function() {
+                handleLocationError(true, infoWindow, vm.map.getCenter());
+            });
+        } else {
+        // Browser doesn't support Geolocation
+            handleLocationError(false, infoWindow, vm.map.getCenter());
+        }
+
+
+        function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+            infoWindow.setPosition(pos);
+            infoWindow.setContent(browserHasGeolocation ?
+                'Error: The Geolocation service failed.' :
+                'Error: Your browser doesn\'t support geolocation.');
+        }
+        function CreateMap(element,options)
+        {
+            var map = new google.maps.Map(element,options);
+            return map;
+        }
+
+        function setMarkers(map,data){
+            setAllMarkers(null);
+            vm.markers = [];
+            for(var i = 0;i < data.length;i++){  
+                var myLatLng={lat:data[i].geometry.location.lat,lng:data[i].geometry.location.lng};
+                var marker = new google.maps.Marker({
+                    position:myLatLng,
+                });
+                vm.markers.push(marker);
+            }
+            setAllMarkers(map);
+        }
+        function setAllMarkers(map){
+            for(var i = 0;i < vm.markers.length;i++)
+            {
+                vm.markers[i].setMap(map);
+            }
+        }
+        function setAnimation(index){
+            vm.markers[index].setAnimation(google.maps.Animation.BOUNCE);
+        }
+        function stopAnimation(index){
+            vm.markers[index].setAnimation(null);
+        }
+        $rootScope.$on('setMarkers',function(event,data){
+
+            vm.setMarkers(vm.map,data.data);
+        });
+        $rootScope.$on('setAnimation',function(event,data)
+        {
+            vm.setAnimation(data.index);
+        });
+        $rootScope.$on('stopAnimation',function(event,data){
+            vm.stopAnimation(data.index);
+        });
+
+
+
+    }
+})();
+
+// searchCtrl.ctrl.js
+
 (function(){
     'use strict';
 
     angular
         .module('myApp')
-        .filter('nonagent',nonAgent);
+        .controller('SearchController',SearchController);
 
-    function nonAgent(){
-        return exCludeAgent;
+    SearchController.$inject = ['location'];
+    function SearchController(location){
+        var vm = this;
+        vm.model = location;
+        vm.show = true;
+        vm.toggle = toggle;
 
-        function exCludeAgent(data){
-            var out = [];
-            for(var i = 0;i < data.length;i++)
+        function toggle(){
+            vm.show = !vm.show;
+            var button = angular.element('.pane-toggle-button');
+            if(!vm.show)
             {
+                angular.element('.pane-toggle-button-container').css('left','0px');
 
-                if(data[i].types.indexOf("travel_agency") === -1 && ('rating' in data[i]))
-                {
-                    out.push(data[i]);
-                }
+                button.css('transform','scaleX(-1)');
+                button.attr('data-original-title','expand side pane');
+
             }
+            else
+            {
+                angular.element('.pane-toggle-button-container').css('left','100%');
+                button.css('transform','scaleX(1)');
+                button.attr('data-original-title','collapse side pane');
 
-            return out;
+            }
         }
+
     }
 })();
 
@@ -453,6 +465,7 @@ angular.module('myApp',['ngAnimate']);
             return $http.get(url)
                 .then(function(response){
                     model.data = response.data.results;
+
                     if('next_page_token' in response.data){
                         model.nextPageToken = response.data.next_page_token;
                     }
@@ -461,7 +474,6 @@ angular.module('myApp',['ngAnimate']);
                     }
                     model.isZeroData = (response.data.results.length === 0)?1:2;
                 });
-            console.log("ishere");
         }
         function next(){
             if(model.nextPageToken !== "")
@@ -487,5 +499,35 @@ angular.module('myApp',['ngAnimate']);
 
         }
         return model;
+    }
+})();
+
+//nonAgent.filter.js
+
+// filter used to eliminate the travel_agency results from google search
+//update: used it to eliminate non-rating results also
+(function(){
+    'use strict';
+
+    angular
+        .module('myApp')
+        .filter('nonagent',nonAgent);
+
+    function nonAgent(){
+        return exCludeAgent;
+
+        function exCludeAgent(data){
+            var out = [];
+            for(var i = 0;i < data.length;i++)
+            {
+
+                if(data[i].types.indexOf("travel_agency") === -1 && ('rating' in data[i]))
+                {
+                    out.push(data[i]);
+                }
+            }
+
+            return out;
+        }
     }
 })();

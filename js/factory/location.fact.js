@@ -25,6 +25,7 @@
             return $http.get(url)
                 .then(function(response){
                     model.data = response.data.results;
+
                     if('next_page_token' in response.data){
                         model.nextPageToken = response.data.next_page_token;
                     }
@@ -33,7 +34,6 @@
                     }
                     model.isZeroData = (response.data.results.length === 0)?1:2;
                 });
-            console.log("ishere");
         }
         function next(){
             if(model.nextPageToken !== "")

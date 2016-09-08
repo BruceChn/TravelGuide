@@ -186,6 +186,12 @@ span{
 #attractionList.ng-hide-add, #attractionList.ng-hide-remove{
     transition:0.2s linear all;
 }
+.pane-section-pagination.ng-hide{
+    transform:translateX(-100%);
+}
+.pane-section-pagination.ng-hide-add, .pane-section-pagination.ng-hide-remove{
+    transition:0.2s linear all;
+}
 #attractionList li{
     background-color:#fafafa;
 }

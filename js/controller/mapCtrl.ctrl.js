@@ -7,16 +7,20 @@
 
     //var map = new google.maps.Map(document.getElementById('map'),mapOptions);
 
-    MapController.$inject = ['$window','location'];
+    MapController.$inject = ['$window','location','$rootScope'];
 
-    function MapController($window,location){
+    function MapController($window,location,$rootScope){
         var vm = this;
         var mapOptions = {
             center:{lat:37.397,lng:-121.644},
             zoom:11
         };
 
-        var input = location.searchInput;
+        vm.model = location;
+        vm.markers = [];
+        vm.setMarkers = setMarkers;
+        vm.setAnimation = setAnimation;
+        vm.stopAnimation = stopAnimation;
         vm.map = CreateMap(document.getElementById('map'),mapOptions);
         var infoWindow = new google.maps.InfoWindow({map: vm.map});
 
@@ -27,8 +31,7 @@
                     lng: position.coords.longitude
                 };
 
-                infoWindow.setPosition(pos);
-                infoWindow.setContent('Current Location');
+
                 vm.map.setCenter(pos);
             }, function() {
                 handleLocationError(true, infoWindow, vm.map.getCenter());
@@ -47,7 +50,47 @@
         }
         function CreateMap(element,options)
         {
-            return new google.maps.Map(element,options);
+            var map = new google.maps.Map(element,options);
+            return map;
         }
+
+        function setMarkers(map,data){
+            setAllMarkers(null);
+            vm.markers = [];
+            for(var i = 0;i < data.length;i++){  
+                var myLatLng={lat:data[i].geometry.location.lat,lng:data[i].geometry.location.lng};
+                var marker = new google.maps.Marker({
+                    position:myLatLng,
+                });
+                vm.markers.push(marker);
+            }
+            setAllMarkers(map);
+        }
+        function setAllMarkers(map){
+            for(var i = 0;i < vm.markers.length;i++)
+            {
+                vm.markers[i].setMap(map);
+            }
+        }
+        function setAnimation(index){
+            vm.markers[index].setAnimation(google.maps.Animation.BOUNCE);
+        }
+        function stopAnimation(index){
+            vm.markers[index].setAnimation(null);
+        }
+        $rootScope.$on('setMarkers',function(event,data){
+
+            vm.setMarkers(vm.map,data.data);
+        });
+        $rootScope.$on('setAnimation',function(event,data)
+        {
+            vm.setAnimation(data.index);
+        });
+        $rootScope.$on('stopAnimation',function(event,data){
+            vm.stopAnimation(data.index);
+        });
+
+
+
     }
 })();

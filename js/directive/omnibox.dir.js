@@ -5,8 +5,8 @@
         .module('myApp')
         .directive('omnibox',OmniBox);
 
-    OmniBox.$inject = ['location'];
-    function OmniBox(location){
+    OmniBox.$inject = ['location','$rootScope','$filter'];
+    function OmniBox(location,$rootScope,$filter){
         var directive ={
             restrict:'E',
             scope:{},
@@ -28,9 +28,11 @@
                 {
                     vm.model.currentIndex = 0;
                     var promise = location.search(input);
+
                     element.find('button.searchbtnbox').toggleClass('changed');
                     promise.then(function(){
                         element.find('button.searchbtnbox').toggleClass('changed');
+                        $rootScope.$emit('setMarkers',{data:$filter('orderBy')($filter('nonagent')(location.data),'-rating')});
                     },function(error){
                         console.log(error);
                     });
@@ -40,32 +42,8 @@
         }
     }
 })();
-    // OmniboxController.$inject = ['location','$http'];
-    // function OmniboxController(location,$http){
-    //     var vm = this;
-    //     vm.model = location;
-    //     vm.SearchAttraction = SearchAttraction;
-    //
-    //     function randomString(length, chars) {
-    //             var result = '';
-    //             for (var i = length; i > 0; --i) result += chars[Math.round(Math.random() * (chars.length - 1))];
-    //             return result;
-    //     }
-    //     function SearchAttraction(input){
-    //
-    //         if(input !== '' && input !== undefined)
-    //         {
-    //             vm.model.currentIndex = 0;
-    //             var promise = location.search(input);
-    //             console.log(promise);
-    //             // var promise = location.search(input);
-    //             // console.log(promise);
-    //             // promise.then(function(response){
-    //             //     console.log("ishere");
-    //             // },function(error){
-    //             //     console.log(error);
-    //             // });
-    //         }
+
+
     //         // var options = {
     //         //     encodeSignature: true // will encode the signature following the RFC 3986 Spec by default
     //         // };
