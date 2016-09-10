@@ -442,8 +442,8 @@ angular.module('myApp',['ngAnimate','ui.router']);
     angular
         .module('myApp')
         .directive('detail',detail);
-    detail.$inject = ['$http','location'];
-    function detail($http,location){
+    detail.$inject = ['$rootScope','location','$state'];
+    function detail($rootScope,location,$state){
         var directive ={
             restrict:'E',
             scope:{
@@ -455,6 +455,7 @@ angular.module('myApp',['ngAnimate','ui.router']);
             scope.name = location.detail.name;
             scope.types = [];
             scope.rating = location.detail.rating;
+            scope.back = back;
 
             //set rating value and photo src url and set types
             activate();
@@ -467,7 +468,10 @@ angular.module('myApp',['ngAnimate','ui.router']);
                 getDetailPhotos();
 
             }
-
+            function back(){
+                $state.go('attraction');
+                $rootScope.$emit('setCenter',{position:{lat:location.data[0].geometry.location.lat,lng:location.data[0].geometry.location.lng}});
+            }
             function setTypes(){
                 angular.forEach(location.detail.types,function(value)
                 {

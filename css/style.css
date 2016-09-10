@@ -93,6 +93,7 @@ html,body{
     top:0;
     left:0;
     margin:8px 0 8px 8px
+
 }
 .search{
     position:relative;
@@ -387,7 +388,27 @@ main.ng-hide-add, main.ng-hide-remove{
     opacity:1;
 }
 /*Ch07 attractionDetail##############################################################################################################################*/
-
+.return-button{
+    position:absolute;
+    top:-8px;
+    left:8px;
+    font-size:13px;
+    border-top:1px solid rgb(246, 246, 246);
+    border-bottom:0px;
+    border-left:0px;
+    border-right:0px;
+    background-color:#fff;
+    width:392px;
+    text-align:left;
+    height:31px;
+    padding:8px 20px;
+    border-radius:0px 0px 2px 2px;
+    color:#4285F4;
+    cursor:default;
+}
+.return-button span{
+    cursor:pointer;
+}
 div #detail{
     display:flex;
     flex-direction: column;
