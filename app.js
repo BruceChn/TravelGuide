@@ -76,7 +76,7 @@ angular.module('myApp',['ngAnimate','ui.router']);
         vm.setAnimation = setAnimation;
         vm.stopAnimation = stopAnimation;
         vm.map = CreateMap(document.getElementById('map'),mapOptions);
-        var infoWindow = new google.maps.InfoWindow({map: vm.map});
+
 
         if ($window.navigator.geolocation) {
              $window.navigator.geolocation.getCurrentPosition(function(position) {
@@ -88,15 +88,16 @@ angular.module('myApp',['ngAnimate','ui.router']);
 
                 vm.map.setCenter(pos);
             }, function() {
-                handleLocationError(true, infoWindow, vm.map.getCenter());
+                handleLocationError(true,vm.map.getCenter());
             });
         } else {
         // Browser doesn't support Geolocation
-            handleLocationError(false, infoWindow, vm.map.getCenter());
+            handleLocationError(false,vm.map.getCenter());
         }
 
 
-        function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+        function handleLocationError(browserHasGeolocation, pos) {
+            var infoWindow = new google.maps.InfoWindow({map: vm.map});
             infoWindow.setPosition(pos);
             infoWindow.setContent(browserHasGeolocation ?
                 'Error: The Geolocation service failed.' :
@@ -116,6 +117,11 @@ angular.module('myApp',['ngAnimate','ui.router']);
                 var marker = new google.maps.Marker({
                     position:myLatLng,
                 });
+                marker.addListener('click',(function(i){
+                    return function(){
+                        $rootScope.$emit('getDetail',{index:i});
+                    };
+                })(i));
                 vm.markers.push(marker);
             }
             setAllMarkers(map);
@@ -144,13 +150,13 @@ angular.module('myApp',['ngAnimate','ui.router']);
             vm.stopAnimation(data.index);
         });
         $rootScope.$on('setCenter',function(event,data){
-            vm.map.setCenter(data.position);
+            vm.map.panTo(data.position);
             vm.map.setZoom(11);
         });
         $rootScope.$on('setMapCenter',function(event,data){
-            vm.map.setCenter(data.location);
+            vm.map.panTo(data.location);
             vm.map.setZoom(16);
-        })
+        });
 
 
 
@@ -232,6 +238,9 @@ angular.module('myApp',['ngAnimate','ui.router']);
                 scope.results = [];
                 scope.currentStart = 1;
 
+            });
+            $rootScope.$on('getDetail',function(event,data){
+                getDetail(scope.model.currentIndex,data.index);
             });
             //watch if in the first page
             scope.$watch('model.currentIndex',function(newValue, oldValue, scope){
@@ -443,7 +452,6 @@ angular.module('myApp',['ngAnimate','ui.router']);
             templateUrl:"templates/detail.html"
         };
         function link(scope,element,attr){
-            console.log(location.detail);
             scope.name = location.detail.name;
             scope.types = [];
             scope.rating = location.detail.rating;

@@ -22,7 +22,7 @@
         vm.setAnimation = setAnimation;
         vm.stopAnimation = stopAnimation;
         vm.map = CreateMap(document.getElementById('map'),mapOptions);
-        var infoWindow = new google.maps.InfoWindow({map: vm.map});
+
 
         if ($window.navigator.geolocation) {
              $window.navigator.geolocation.getCurrentPosition(function(position) {
@@ -34,15 +34,16 @@
 
                 vm.map.setCenter(pos);
             }, function() {
-                handleLocationError(true, infoWindow, vm.map.getCenter());
+                handleLocationError(true,vm.map.getCenter());
             });
         } else {
         // Browser doesn't support Geolocation
-            handleLocationError(false, infoWindow, vm.map.getCenter());
+            handleLocationError(false,vm.map.getCenter());
         }
 
 
-        function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+        function handleLocationError(browserHasGeolocation, pos) {
+            var infoWindow = new google.maps.InfoWindow({map: vm.map});
             infoWindow.setPosition(pos);
             infoWindow.setContent(browserHasGeolocation ?
                 'Error: The Geolocation service failed.' :
@@ -62,6 +63,11 @@
                 var marker = new google.maps.Marker({
                     position:myLatLng,
                 });
+                marker.addListener('click',(function(i){
+                    return function(){
+                        $rootScope.$emit('getDetail',{index:i});
+                    };
+                })(i));
                 vm.markers.push(marker);
             }
             setAllMarkers(map);
@@ -90,13 +96,13 @@
             vm.stopAnimation(data.index);
         });
         $rootScope.$on('setCenter',function(event,data){
-            vm.map.setCenter(data.position);
+            vm.map.panTo(data.position);
             vm.map.setZoom(11);
         });
         $rootScope.$on('setMapCenter',function(event,data){
-            vm.map.setCenter(data.location);
+            vm.map.panTo(data.location);
             vm.map.setZoom(16);
-        })
+        });
 
 
 

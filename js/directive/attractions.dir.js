@@ -35,6 +35,9 @@
                 scope.currentStart = 1;
 
             });
+            $rootScope.$on('getDetail',function(event,data){
+                getDetail(scope.model.currentIndex,data.index);
+            });
             //watch if in the first page
             scope.$watch('model.currentIndex',function(newValue, oldValue, scope){
 

@@ -16,7 +16,6 @@
             templateUrl:"templates/detail.html"
         };
         function link(scope,element,attr){
-            console.log(location.detail);
             scope.name = location.detail.name;
             scope.types = [];
             scope.rating = location.detail.rating;
