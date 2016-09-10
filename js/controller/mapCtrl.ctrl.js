@@ -57,7 +57,7 @@
         function setMarkers(map,data){
             setAllMarkers(null);
             vm.markers = [];
-            for(var i = 0;i < data.length;i++){  
+            for(var i = 0;i < data.length;i++){
                 var myLatLng={lat:data[i].geometry.location.lat,lng:data[i].geometry.location.lng};
                 var marker = new google.maps.Marker({
                     position:myLatLng,
@@ -89,6 +89,14 @@
         $rootScope.$on('stopAnimation',function(event,data){
             vm.stopAnimation(data.index);
         });
+        $rootScope.$on('setCenter',function(event,data){
+            vm.map.setCenter(data.position);
+            vm.map.setZoom(11);
+        });
+        $rootScope.$on('setMapCenter',function(event,data){
+            vm.map.setCenter(data.location);
+            vm.map.setZoom(16);
+        })
 
 
 

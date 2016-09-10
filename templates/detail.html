@@ -1,0 +1,59 @@
+<div id = "detail">
+    <img class = "header_img" />
+    <div class = "title-container">
+        <h3><span>{{name}}</span></h3>
+        <span class = "detail-result-rating">
+            <span class = "detail-rating">{{rating|number:1}}</span>
+            <span class = "detail-stars">
+                <span class = "detail-nonEmptyStars"></span>
+            </span>
+        </span>
+        <span class = "detail-types">
+            <span class = "detail-type" ng-repeat = "type in types">
+                {{type}}
+                <span ng-show = '!$last'>,</span>
+            </span>
+        </span>
+    </div>
+    <div id = "img-slider-header" class = "panel panel-info">
+        <div class="panel-heading">
+            Photos
+        </div>
+
+    </div>
+    <div id = "imgSlider">
+        <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+            <ol class="carousel-indicators">
+                <li data-target="#carousel-example-generic" data-slide-to="{{$index}}" ng-class="{'active':$first}" ng-repeat="photo in photos"></li>
+            </ol>
+            <div class="carousel-inner" role="listbox">
+                <div ng-class="['item',{'active':$first}]" ng-repeat="photo in photos">
+                    <img id="carousel-img" ng-src="{{photo}}" alt="First slide">
+                </div>
+
+            </div>
+            <a class="left carousel-control" data-target="#carousel-example-generic" role="button" data-slide="prev">
+                <span class="icon-prev" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="right carousel-control" data-target="#carousel-example-generic" role="button" data-slide="next">
+                <span class="icon-next" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
+        </div>
+    </div>
+    <div id = "wiki">
+        <div class = "panel panel-primary">
+            <div class="panel-heading">
+                Wikipedia
+            </div>
+            <div class ="panel-body">
+
+                <span class="wikipedia-link"><a target ="_blank" href = "{{wikilink}}">wikipedia</a></span>
+            </div>
+        </div>
+    </div>
+    <div id = "yelp">
+
+    </div>
+</div>

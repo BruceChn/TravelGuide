@@ -14,6 +14,7 @@
 
         function exCludeAgent(data){
             var out = [];
+            
             for(var i = 0;i < data.length;i++)
             {
 

@@ -1,1 +1,1 @@
-angular.module('myApp',['ngAnimate']);
+angular.module('myApp',['ngAnimate','ui.router']);

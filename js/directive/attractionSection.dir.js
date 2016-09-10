@@ -15,6 +15,9 @@
             scope:{
                 name:'@',
                 rating:'@',
+                location:'@',
+                pageIndex:'=',
+                click:'&'
             },
             // controller:SectionController,
             // controllerAs:'SectCtrl',
@@ -26,6 +29,8 @@
             scope.show = show;
             var css =  (scope.rating/5.0 * 65).toString() + 'px';
             element.find("span.nonEmptyStars").css("width",css);
+            scope.index = parseInt(attr.index);
+
             if ('photos' in location.data[parseInt(attr.index)]){
                 var photo_reference = location.data[parseInt(attr.index)].photos[0].photo_reference;
                 var url = "https://maps.googleapis.com/maps/api/place/photo?maxwidth="+

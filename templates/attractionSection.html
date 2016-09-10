@@ -1,5 +1,5 @@
 <div class = "attraction_section">
-    <div class = "attraction_description">
+    <div class = "attraction_description" ng-click="click({pageIndex:pageIndex,index:index})" >
         <div class = 'result-title-container'>
             <h3><span class ="result-title">{{name}}</span></h3>
             <span class = "result-rating">
@@ -8,10 +8,14 @@
                     <span class = "nonEmptyStars"></span>
                 </span>
             </span>
+
+            <h4><span class = "result-location">{{location}}</span></h4>
+
         </div>
 
     </div>
     <div id = "attraction_img">
         <img class = "attraction_img" ng-click = "show()"/>
     </div>
+
 </div>
