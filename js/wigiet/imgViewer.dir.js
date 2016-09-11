@@ -3,7 +3,7 @@
     'use strict';
 
     angular
-        .module('app.attraction')
+        .module('app.widget')
         .directive('imgViewer',imgViewer);
 
     function imgViewer(){
