@@ -35,6 +35,7 @@
             if ('photos' in scope.model.data[parseInt(attr.index)]){
                 //var photo_reference = scope.model.data[parseInt(attr.index)].photos[0].photo_reference;
                 var url = scope.model.data[parseInt(attr.index)].photos[0].getUrl({maxWidth:80});
+
                 element.find("img.attraction_img").attr('src',url);
 
             }
@@ -45,6 +46,7 @@
 
                 var img = new Image();
                 if ('photos' in scope.model.data[parseInt(attr.index)]){
+
                     img.src= scope.model.data[parseInt(attr.index)].photos[0].getUrl({maxWidth:$window.innerWidth * 0.9});
                     img.onload = function(){
 
@@ -52,13 +54,15 @@
                         angular.element('#myModal').find('.img').html(img);
                         angular.element('#myModal').modal();
                     };
-
-
-
                 }
                 else {
-                    angular.element('#myModal').find('img').attr('src',"img/img_not_available.jpg");
-                    angular.element('#myModal').modal();
+                    img.src = "img/img_not_available.jpg";
+                    img.onload = function(){
+
+                        angular.element('#myModal').find('.modal-dialog').css('width',img.width);
+                        angular.element('#myModal').find('.img').html(img);
+                        angular.element('#myModal').modal();
+                    };
                 }
             }
 

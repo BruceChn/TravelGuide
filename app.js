@@ -245,6 +245,7 @@ angular.module('app',[
             if ('photos' in scope.model.data[parseInt(attr.index)]){
                 //var photo_reference = scope.model.data[parseInt(attr.index)].photos[0].photo_reference;
                 var url = scope.model.data[parseInt(attr.index)].photos[0].getUrl({maxWidth:80});
+
                 element.find("img.attraction_img").attr('src',url);
 
             }
@@ -255,6 +256,7 @@ angular.module('app',[
 
                 var img = new Image();
                 if ('photos' in scope.model.data[parseInt(attr.index)]){
+
                     img.src= scope.model.data[parseInt(attr.index)].photos[0].getUrl({maxWidth:$window.innerWidth * 0.9});
                     img.onload = function(){
 
@@ -262,13 +264,15 @@ angular.module('app',[
                         angular.element('#myModal').find('.img').html(img);
                         angular.element('#myModal').modal();
                     };
-
-
-
                 }
                 else {
-                    angular.element('#myModal').find('img').attr('src',"img/img_not_available.jpg");
-                    angular.element('#myModal').modal();
+                    img.src = "img/img_not_available.jpg";
+                    img.onload = function(){
+
+                        angular.element('#myModal').find('.modal-dialog').css('width',img.width);
+                        angular.element('#myModal').find('.img').html(img);
+                        angular.element('#myModal').modal();
+                    };
                 }
             }
 
@@ -481,7 +485,7 @@ angular.module('app',[
                 }
                 else
                 {
-                    url = "/img/img_not_available.jpg";
+                    url = "img/img_not_available.jpg";
                 }
                 element.find('img.header_img').attr('src',url);
             }
@@ -713,8 +717,8 @@ angular.module('app',[
         function getWikipedia(title){
             var url = "https://en.wikipedia.org/w/api.php?"+
             "action=query&format=json&prop=&list=search&meta=&utf8=1&srsearch="+ title +
-            "&srlimit=1&srprop=sectionsnippet%7Csnippet%7Ctitlesnippet&srinterwiki=1";
-            return $http.get(url)
+            "&srlimit=1&srprop=sectionsnippet%7Csnippet%7Ctitlesnippet&srinterwiki=1&callback=JSON_CALLBACK";
+            return $http.jsonp(url)
                 .then(function(response){
                     model.wikipedia = response.data.query.search[0];
                 });

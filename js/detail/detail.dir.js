@@ -61,7 +61,7 @@
                 }
                 else
                 {
-                    url = "/img/img_not_available.jpg";
+                    url = "img/img_not_available.jpg";
                 }
                 element.find('img.header_img').attr('src',url);
             }

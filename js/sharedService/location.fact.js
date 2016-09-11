@@ -76,8 +76,8 @@
         function getWikipedia(title){
             var url = "https://en.wikipedia.org/w/api.php?"+
             "action=query&format=json&prop=&list=search&meta=&utf8=1&srsearch="+ title +
-            "&srlimit=1&srprop=sectionsnippet%7Csnippet%7Ctitlesnippet&srinterwiki=1";
-            return $http.get(url)
+            "&srlimit=1&srprop=sectionsnippet%7Csnippet%7Ctitlesnippet&srinterwiki=1&callback=JSON_CALLBACK";
+            return $http.jsonp(url)
                 .then(function(response){
                     model.wikipedia = response.data.query.search[0];
                 });

@@ -428,7 +428,7 @@ div #detail{
     display:flex;
     flex-direction: column;
     padding-top:0px;
-    height:104px;
+
     flex-shrink: 0;
 }
 
