@@ -33,13 +33,8 @@
             scope.index = parseInt(attr.index);
 
             if ('photos' in scope.model.data[parseInt(attr.index)]){
-                var photo_reference = scope.model.data[parseInt(attr.index)].photos[0].photo_reference;
-                var url = "https://maps.googleapis.com/maps/api/place/photo?maxwidth="+
-                $window.innerWidth+
-                "&photoreference="+
-                photo_reference+
-                "&key=AIzaSyB0e53B86tTI03YQGvN6gNA5s-MwTThHHY";
-
+                //var photo_reference = scope.model.data[parseInt(attr.index)].photos[0].photo_reference;
+                var url = scope.model.data[parseInt(attr.index)].photos[0].getUrl({maxWidth:80});
                 element.find("img.attraction_img").attr('src',url);
 
             }
@@ -47,19 +42,23 @@
                 element.find("img.attraction_img").attr('src',"img/img_not_available.jpg");
             }
             function show(){
-                angular.element('#myModal').modal();
+
                 var img = new Image();
                 if ('photos' in scope.model.data[parseInt(attr.index)]){
+                    img.src= scope.model.data[parseInt(attr.index)].photos[0].getUrl({maxWidth:$window.innerWidth * 0.9});
                     img.onload = function(){
+
                         angular.element('#myModal').find('.modal-dialog').css('width',img.width);
                         angular.element('#myModal').find('.img').html(img);
+                        angular.element('#myModal').modal();
                     };
-                    img.src = url;
+
 
 
                 }
                 else {
                     angular.element('#myModal').find('img').attr('src',"img/img_not_available.jpg");
+                    angular.element('#myModal').modal();
                 }
             }
 

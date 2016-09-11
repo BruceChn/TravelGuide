@@ -6,20 +6,22 @@
     angular
         .module('app.service')
         .factory('locationService',locationService);
-    locationService.$inject = ['$http','$filter'];
-    function locationService($http,$filter){
+    locationService.$inject = ['$http','$filter','$q','$timeout'];
+    function locationService($http,$filter,$q,$timeout){
         var model={
             data:[], // used to store the current search result
             isZeroData:0,// 0: don't displya result 1: no return result  2: show results;
             currentIndex:0, // the current index of the page
-            nextPageToken:"", // store the next page token used to query next page
+            pagination:{}, // store the next page token used to query next page
             input:"", // the search input
             detail:{}, //store the results of query detail
             wikipedia:{}, // store the results of query wikipedia
+            map:{},
             search:search,
             next:next,
             getDetail:getDetail,
             getWikipedia:getWikipedia
+
         };
 
 
@@ -30,55 +32,45 @@
             model.input = input;
             var url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=attraction+in+" +
                 model.input + "&key=AIzaSyB0e53B86tTI03YQGvN6gNA5s-MwTThHHY";
-            return $http.get(url)
-                .then(function(response){
-                    model.data = $filter('orderBy')($filter('nonagent')(response.data.results),'-rating');
+            var request ={
+                query:'attraction in'+input
+            };
+            var service = new google.maps.places.PlacesService(model.map);
+            model.defer = $q.defer();
+            service.textSearch(request,callback);
+            return model.defer.promise;
 
-                    if('next_page_token' in response.data){
-                        model.nextPageToken = response.data.next_page_token;
-                    }
-                    else {
-                        model.nextPageToken = "";
-                    }
-                    model.isZeroData = (response.data.results.length === 0)?1:2;
-                });
         }
         // get the next list results
         function next(){
-            if(model.nextPageToken !== "")
+            model.defer = $q.defer();
+            if(model.pagination.hasNextPage)
             {
-
-                var url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=attraction+in+" +
-                    model.input + "&key=AIzaSyB0e53B86tTI03YQGvN6gNA5s-MwTThHHY" +  "&pagetoken=" + model.nextPageToken;
-
                 model.currentIndex++;
-                return $http.get(url)
-                        .then(function(response){
-                            model.data = $filter('orderBy')($filter('nonagent')(response.data.results),'-rating');
-
-                            if('next_page_token' in response.data)
-                            {
-                                model.nextPageToken = response.data.next_page_token;
-                            }
-                            else {
-                                model.nextPageToken = "";
-                            }
-
-                            model.isZeroData = (response.data.results.length === 0)?1:2;
-                        });
+                model.pagination.nextPage();
 
             }
-
+            return model.defer.promise;
         }
         // get the details of the selected attraction
-        function getDetail(reference){
-            var url = "https://maps.googleapis.com/maps/api/place/details/json?reference="+
-            reference + "&key=AIzaSyB0e53B86tTI03YQGvN6gNA5s-MwTThHHY";
-            return $http.get(url)
-                .then(function(response){
-                    model.detail = response.data.result;
+        function getDetail(id){
 
-                });
+            var service = new google.maps.places.PlacesService(model.map);
+            model.defer = $q.defer();
+            var request = {
+                placeId:id
+            };
+            service.getDetails(request,callback);
+            function callback(place,status){
+                if (status == google.maps.places.PlacesServiceStatus.OK) {
+                    model.detail = place;
+                    model.defer.resolve();
+                }
+                else{
+                    model.defer.reject("can't find the place details");
+                }
+            }
+            return model.defer.promise;
         }
         //get the wikipedia result of the selected attraction
         function getWikipedia(title){
@@ -90,6 +82,26 @@
                     model.wikipedia = response.data.query.search[0];
                 });
         }
+        function callback(results,status,pagination){
+
+            if (status == google.maps.places.PlacesServiceStatus.OK) {
+
+                model.data = $filter('orderBy')($filter('nonagent')(results),'-rating');
+
+                model.pagination = pagination;
+
+
+                model.isZeroData = (results.length === 0)?1:2;
+                model.defer.resolve();
+            }
+            else {
+                model.defer.reject("Can't get the result");
+            }
+
+
+        }
+
+
 
     }
 })();

@@ -7,9 +7,9 @@
 
     //var map = new google.maps.Map(document.getElementById('map'),mapOptions);
 
-    MapController.$inject = ['$window','locationService','$rootScope'];
+    MapController.$inject = ['$window','locationService','$rootScope','eventService'];
 
-    function MapController($window,locationService,$rootScope){
+    function MapController($window,locationService,$rootScope,eventService){
         var vm = this;
         var mapOptions = {
             center:{lat:37.397,lng:-121.644},
@@ -17,11 +17,13 @@
         };
 
         vm.model = locationService;
+        vm.event = eventService;
         vm.markers = [];
         vm.setMarkers = setMarkers;
         vm.setAnimation = setAnimation;
         vm.stopAnimation = stopAnimation;
-        vm.map = CreateMap(document.getElementById('map'),mapOptions);
+
+        vm.model.map = CreateMap(document.getElementById('map'),mapOptions);
 
 
         if ($window.navigator.geolocation) {
@@ -31,19 +33,19 @@
                     lng: position.coords.longitude
                 };
 
-
-                vm.map.setCenter(pos);
+                if(vm.model.map !== {})
+                    vm.model.map.setCenter(pos);
             }, function() {
-                handleLocationError(true,vm.map.getCenter());
+                handleLocationError(true,vm.model.map.getCenter());
             });
         } else {
         // Browser doesn't support Geolocation
-            handleLocationError(false,vm.map.getCenter());
+            handleLocationError(false,vm.model.map.getCenter());
         }
 
 
         function handleLocationError(browserHasGeolocation, pos) {
-            var infoWindow = new google.maps.InfoWindow({map: vm.map});
+            var infoWindow = new google.maps.InfoWindow({map: vm.model.map});
             infoWindow.setPosition(pos);
             infoWindow.setContent(browserHasGeolocation ?
                 'Error: The Geolocation service failed.' :
@@ -59,16 +61,17 @@
             setAllMarkers(null);
             vm.markers = [];
             for(var i = 0;i < data.length;i++){
-                var myLatLng={lat:data[i].geometry.location.lat,lng:data[i].geometry.location.lng};
+                var myLatLng={lat:data[i].geometry.location.lat(),lng:data[i].geometry.location.lng()};
                 var marker = new google.maps.Marker({
                     position:myLatLng,
                 });
                 marker.addListener('click',(function(i){
                     return function(){
-                        $rootScope.$emit('getDetail',{index:i});
+                        vm.event.getDetail(vm.model.currentIndex,i);
                     };
                 })(i));
                 vm.markers.push(marker);
+
             }
             setAllMarkers(map);
         }
@@ -85,8 +88,7 @@
             vm.markers[index].setAnimation(null);
         }
         $rootScope.$on('setMarkers',function(event,data){
-
-            vm.setMarkers(vm.map,data.data);
+            vm.setMarkers(vm.model.map,data.data);
         });
         $rootScope.$on('setAnimation',function(event,data)
         {
@@ -96,12 +98,12 @@
             vm.stopAnimation(data.index);
         });
         $rootScope.$on('setCenter',function(event,data){
-            vm.map.panTo(data.geolocation);
-            vm.map.setZoom(11);
+            vm.model.map.panTo(data.geolocation);
+            vm.model.map.setZoom(11);
         });
         $rootScope.$on('setMapCenter',function(event,data){
-            vm.map.panTo(data.geolocation);
-            vm.map.setZoom(16);
+            vm.model.map.panTo(data.geolocation);
+            vm.model.map.setZoom(16);
         });
 
 
