@@ -9,9 +9,11 @@
     locationService.$inject = ['$http','$filter','$q','$timeout'];
     function locationService($http,$filter,$q,$timeout){
         var model={
-            data:[], // used to store the current search result
+            data:[],// used to store the current search result
+            results:[], //used to store all the results
             isZeroData:0,// 0: don't displya result 1: no return result  2: show results;
             currentIndex:0, // the current index of the page
+            currentStart:1,
             pagination:{}, // store the next page token used to query next page
             input:"", // the search input
             detail:{}, //store the results of query detail
@@ -61,6 +63,7 @@
                 placeId:id
             };
             service.getDetails(request,callback);
+
             function callback(place,status){
                 if (status == google.maps.places.PlacesServiceStatus.OK) {
                     model.detail = place;
@@ -89,8 +92,6 @@
                 model.data = $filter('orderBy')($filter('nonagent')(results),'-rating');
 
                 model.pagination = pagination;
-
-
                 model.isZeroData = (results.length === 0)?1:2;
                 model.defer.resolve();
             }

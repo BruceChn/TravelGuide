@@ -28,19 +28,27 @@
         {
             scope.model = locationService;
             scope.show = show;
-            var css =  (scope.rating/5.0 * 65).toString() + 'px';
-            element.find("span.nonEmptyStars").css("width",css);
             scope.index = parseInt(attr.index);
+            activate();
 
-            if ('photos' in scope.model.data[parseInt(attr.index)]){
-                //var photo_reference = scope.model.data[parseInt(attr.index)].photos[0].photo_reference;
-                var url = scope.model.data[parseInt(attr.index)].photos[0].getUrl({maxWidth:80});
-
-                element.find("img.attraction_img").attr('src',url);
-
+            function activate(){
+                setImg();
             }
-            else {
-                element.find("img.attraction_img").attr('src',"img/img_not_available.jpg");
+            function setImg(){
+                var css =  (scope.rating/5.0 * 65).toString() + 'px';
+                element.find("span.nonEmptyStars").css("width",css);
+
+
+                if ('photos' in scope.model.data[parseInt(attr.index)]){
+                    //var photo_reference = scope.model.data[parseInt(attr.index)].photos[0].photo_reference;
+                    var url = scope.model.data[parseInt(attr.index)].photos[0].getUrl({maxWidth:80});
+
+                    element.find("img.attraction_img").attr('src',url);
+
+                }
+                else {
+                    element.find("img.attraction_img").attr('src',"img/img_not_available.jpg");
+                }
             }
             function show(){
 

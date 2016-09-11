@@ -24,14 +24,13 @@
 
             scope.model = locationService;
             scope.event = eventService;
-            scope.results = [];
-            scope.currentStart = 1;
             scope.previous = previous;
             scope.next = next;
             scope.animate = animate;
             scope.stopAnimate = stopAnimate;
             scope.event.getDetail = getDetail;
             scope.event.reset = reset;
+
 
             //watch if in the first page
             scope.$watch('model.currentIndex',function(newValue, oldValue, scope){
@@ -46,28 +45,28 @@
             },true);
 
             function reset(){
-                scope.results = [];
-                scope.currentStart = 1;
+                scope.model.results = [];
+                scope.model.currentStart = 1;
             }
             // go to the previous page
             function previous(){
                 scope.model.currentIndex--;
-                scope.model.data = scope.results[scope.model.currentIndex];
-                scope.currentStart = scope.currentStart - scope.results[scope.model.currentIndex].length;
+                scope.model.data = scope.model.results[scope.model.currentIndex];
+                scope.model.currentStart = scope.model.currentStart - scope.model.results[scope.model.currentIndex].length;
                 $rootScope.$emit('setMarkers',{data:scope.model.data});
             }
             // go to the next page
             function next(){
 
                 // if in the last page, then go to the new page needs http request
-                if(scope.model.currentIndex === (scope.results.length - 1))
+                if(scope.model.currentIndex === (scope.model.results.length - 1))
                 {
                     angular.element('button.searchbtnbox').toggleClass('changed');
                     angular.element('div.section-refresh-overlay').css('visibility','visible');
                     var promise = scope.model.next();
                     promise.then(function(response){
 
-                        scope.currentStart += scope.results[scope.model.currentIndex - 1].length;
+                        scope.model.currentStart += scope.model.results[scope.model.currentIndex - 1].length;
                         angular.element('button.searchbtnbox').toggleClass('changed');
                         angular.element('div.section-refresh-overlay').css('visibility','hidden');
                         $rootScope.$emit('setMarkers',{data:scope.model.data});
@@ -78,8 +77,8 @@
                 }
                 else {
                     scope.model.currentIndex++;
-                    scope.model.data = scope.results[scope.model.currentIndex];
-                    scope.currentStart += scope.results[scope.model.currentIndex - 1].length;
+                    scope.model.data = scope.model.results[scope.model.currentIndex];
+                    scope.model.currentStart += scope.model.results[scope.model.currentIndex - 1].length;
                     $rootScope.$emit('setMarkers',{data:scope.model.data});
                 }
             }
@@ -94,9 +93,9 @@
                 angular.element('button.searchbtnbox').toggleClass('changed');
                 angular.element('div.section-refresh-overlay').css('visibility','visible');
                 // var photo_id = ('photos' in scope.results[pageIndex][index]) ?scope.results[pageIndex][index].photos[0].photo_reference:"unavailable";
-                $rootScope.$emit('setMapCenter',{geolocation:scope.results[pageIndex][index].geometry.location});
-                var promise1 = scope.model.getDetail(scope.results[pageIndex][index].place_id);
-                var promise2 = scope.model.getWikipedia(scope.results[pageIndex][index].name);
+                $rootScope.$emit('setMapCenter',{geolocation:scope.model.results[pageIndex][index].geometry.location});
+                var promise1 = scope.model.getDetail(scope.model.results[pageIndex][index].place_id);
+                var promise2 = scope.model.getWikipedia(scope.model.results[pageIndex][index].name);
                 $q.all([promise1,promise2]).then(function(){
 
                     angular.element('div.section-refresh-overlay').css('visibility','hidden');

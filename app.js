@@ -115,14 +115,13 @@ angular.module('app',[
 
             scope.model = locationService;
             scope.event = eventService;
-            scope.results = [];
-            scope.currentStart = 1;
             scope.previous = previous;
             scope.next = next;
             scope.animate = animate;
             scope.stopAnimate = stopAnimate;
             scope.event.getDetail = getDetail;
             scope.event.reset = reset;
+
 
             //watch if in the first page
             scope.$watch('model.currentIndex',function(newValue, oldValue, scope){
@@ -137,28 +136,28 @@ angular.module('app',[
             },true);
 
             function reset(){
-                scope.results = [];
-                scope.currentStart = 1;
+                scope.model.results = [];
+                scope.model.currentStart = 1;
             }
             // go to the previous page
             function previous(){
                 scope.model.currentIndex--;
-                scope.model.data = scope.results[scope.model.currentIndex];
-                scope.currentStart = scope.currentStart - scope.results[scope.model.currentIndex].length;
+                scope.model.data = scope.model.results[scope.model.currentIndex];
+                scope.model.currentStart = scope.model.currentStart - scope.model.results[scope.model.currentIndex].length;
                 $rootScope.$emit('setMarkers',{data:scope.model.data});
             }
             // go to the next page
             function next(){
 
                 // if in the last page, then go to the new page needs http request
-                if(scope.model.currentIndex === (scope.results.length - 1))
+                if(scope.model.currentIndex === (scope.model.results.length - 1))
                 {
                     angular.element('button.searchbtnbox').toggleClass('changed');
                     angular.element('div.section-refresh-overlay').css('visibility','visible');
                     var promise = scope.model.next();
                     promise.then(function(response){
 
-                        scope.currentStart += scope.results[scope.model.currentIndex - 1].length;
+                        scope.model.currentStart += scope.model.results[scope.model.currentIndex - 1].length;
                         angular.element('button.searchbtnbox').toggleClass('changed');
                         angular.element('div.section-refresh-overlay').css('visibility','hidden');
                         $rootScope.$emit('setMarkers',{data:scope.model.data});
@@ -169,8 +168,8 @@ angular.module('app',[
                 }
                 else {
                     scope.model.currentIndex++;
-                    scope.model.data = scope.results[scope.model.currentIndex];
-                    scope.currentStart += scope.results[scope.model.currentIndex - 1].length;
+                    scope.model.data = scope.model.results[scope.model.currentIndex];
+                    scope.model.currentStart += scope.model.results[scope.model.currentIndex - 1].length;
                     $rootScope.$emit('setMarkers',{data:scope.model.data});
                 }
             }
@@ -185,9 +184,9 @@ angular.module('app',[
                 angular.element('button.searchbtnbox').toggleClass('changed');
                 angular.element('div.section-refresh-overlay').css('visibility','visible');
                 // var photo_id = ('photos' in scope.results[pageIndex][index]) ?scope.results[pageIndex][index].photos[0].photo_reference:"unavailable";
-                $rootScope.$emit('setMapCenter',{geolocation:scope.results[pageIndex][index].geometry.location});
-                var promise1 = scope.model.getDetail(scope.results[pageIndex][index].place_id);
-                var promise2 = scope.model.getWikipedia(scope.results[pageIndex][index].name);
+                $rootScope.$emit('setMapCenter',{geolocation:scope.model.results[pageIndex][index].geometry.location});
+                var promise1 = scope.model.getDetail(scope.model.results[pageIndex][index].place_id);
+                var promise2 = scope.model.getWikipedia(scope.model.results[pageIndex][index].name);
                 $q.all([promise1,promise2]).then(function(){
 
                     angular.element('div.section-refresh-overlay').css('visibility','hidden');
@@ -238,19 +237,27 @@ angular.module('app',[
         {
             scope.model = locationService;
             scope.show = show;
-            var css =  (scope.rating/5.0 * 65).toString() + 'px';
-            element.find("span.nonEmptyStars").css("width",css);
             scope.index = parseInt(attr.index);
+            activate();
 
-            if ('photos' in scope.model.data[parseInt(attr.index)]){
-                //var photo_reference = scope.model.data[parseInt(attr.index)].photos[0].photo_reference;
-                var url = scope.model.data[parseInt(attr.index)].photos[0].getUrl({maxWidth:80});
-
-                element.find("img.attraction_img").attr('src',url);
-
+            function activate(){
+                setImg();
             }
-            else {
-                element.find("img.attraction_img").attr('src',"img/img_not_available.jpg");
+            function setImg(){
+                var css =  (scope.rating/5.0 * 65).toString() + 'px';
+                element.find("span.nonEmptyStars").css("width",css);
+
+
+                if ('photos' in scope.model.data[parseInt(attr.index)]){
+                    //var photo_reference = scope.model.data[parseInt(attr.index)].photos[0].photo_reference;
+                    var url = scope.model.data[parseInt(attr.index)].photos[0].getUrl({maxWidth:80});
+
+                    element.find("img.attraction_img").attr('src',url);
+
+                }
+                else {
+                    element.find("img.attraction_img").attr('src',"img/img_not_available.jpg");
+                }
             }
             function show(){
 
@@ -519,119 +526,6 @@ angular.module('app',[
     }
 })();
 
-//mapCtrl.ctrl.js
-(function(){
-    'use strict';
-    angular
-        .module('app.map')
-        .controller('MapController',MapController);
-
-    //var map = new google.maps.Map(document.getElementById('map'),mapOptions);
-
-    MapController.$inject = ['$window','locationService','$rootScope','eventService'];
-
-    function MapController($window,locationService,$rootScope,eventService){
-        var vm = this;
-        var mapOptions = {
-            center:{lat:37.397,lng:-121.644},
-            zoom:11
-        };
-
-        vm.model = locationService;
-        vm.event = eventService;
-        vm.markers = [];
-        vm.setMarkers = setMarkers;
-        vm.setAnimation = setAnimation;
-        vm.stopAnimation = stopAnimation;
-
-        vm.model.map = CreateMap(document.getElementById('map'),mapOptions);
-
-
-        if ($window.navigator.geolocation) {
-             $window.navigator.geolocation.getCurrentPosition(function(position) {
-                var pos = {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
-                };
-
-                if(vm.model.map !== {})
-                    vm.model.map.setCenter(pos);
-            }, function() {
-                handleLocationError(true,vm.model.map.getCenter());
-            });
-        } else {
-        // Browser doesn't support Geolocation
-            handleLocationError(false,vm.model.map.getCenter());
-        }
-
-
-        function handleLocationError(browserHasGeolocation, pos) {
-            var infoWindow = new google.maps.InfoWindow({map: vm.model.map});
-            infoWindow.setPosition(pos);
-            infoWindow.setContent(browserHasGeolocation ?
-                'Error: The Geolocation service failed.' :
-                'Error: Your browser doesn\'t support geolocation.');
-        }
-        function CreateMap(element,options)
-        {
-            var map = new google.maps.Map(element,options);
-            return map;
-        }
-
-        function setMarkers(map,data){
-            setAllMarkers(null);
-            vm.markers = [];
-            for(var i = 0;i < data.length;i++){
-                var myLatLng={lat:data[i].geometry.location.lat(),lng:data[i].geometry.location.lng()};
-                var marker = new google.maps.Marker({
-                    position:myLatLng,
-                });
-                marker.addListener('click',(function(i){
-                    return function(){
-                        vm.event.getDetail(vm.model.currentIndex,i);
-                    };
-                })(i));
-                vm.markers.push(marker);
-
-            }
-            setAllMarkers(map);
-        }
-        function setAllMarkers(map){
-            for(var i = 0;i < vm.markers.length;i++)
-            {
-                vm.markers[i].setMap(map);
-            }
-        }
-        function setAnimation(index){
-            vm.markers[index].setAnimation(google.maps.Animation.BOUNCE);
-        }
-        function stopAnimation(index){
-            vm.markers[index].setAnimation(null);
-        }
-        $rootScope.$on('setMarkers',function(event,data){
-            vm.setMarkers(vm.model.map,data.data);
-        });
-        $rootScope.$on('setAnimation',function(event,data)
-        {
-            vm.setAnimation(data.index);
-        });
-        $rootScope.$on('stopAnimation',function(event,data){
-            vm.stopAnimation(data.index);
-        });
-        $rootScope.$on('setCenter',function(event,data){
-            vm.model.map.panTo(data.geolocation);
-            vm.model.map.setZoom(11);
-        });
-        $rootScope.$on('setMapCenter',function(event,data){
-            vm.model.map.panTo(data.geolocation);
-            vm.model.map.setZoom(16);
-        });
-
-
-
-    }
-})();
-
 (function(){
     'use strict';
     angular
@@ -658,9 +552,11 @@ angular.module('app',[
     locationService.$inject = ['$http','$filter','$q','$timeout'];
     function locationService($http,$filter,$q,$timeout){
         var model={
-            data:[], // used to store the current search result
+            data:[],// used to store the current search result
+            results:[], //used to store all the results
             isZeroData:0,// 0: don't displya result 1: no return result  2: show results;
             currentIndex:0, // the current index of the page
+            currentStart:1,
             pagination:{}, // store the next page token used to query next page
             input:"", // the search input
             detail:{}, //store the results of query detail
@@ -710,6 +606,7 @@ angular.module('app',[
                 placeId:id
             };
             service.getDetails(request,callback);
+
             function callback(place,status){
                 if (status == google.maps.places.PlacesServiceStatus.OK) {
                     model.detail = place;
@@ -738,8 +635,6 @@ angular.module('app',[
                 model.data = $filter('orderBy')($filter('nonagent')(results),'-rating');
 
                 model.pagination = pagination;
-
-
                 model.isZeroData = (results.length === 0)?1:2;
                 model.defer.resolve();
             }
@@ -851,4 +746,117 @@ angular.module('app',[
 
             }
         });
+})();
+
+//mapCtrl.ctrl.js
+(function(){
+    'use strict';
+    angular
+        .module('app.map')
+        .controller('MapController',MapController);
+
+    //var map = new google.maps.Map(document.getElementById('map'),mapOptions);
+
+    MapController.$inject = ['$window','locationService','$rootScope','eventService'];
+
+    function MapController($window,locationService,$rootScope,eventService){
+        var vm = this;
+        var mapOptions = {
+            center:{lat:37.397,lng:-121.644},
+            zoom:11
+        };
+
+        vm.model = locationService;
+        vm.event = eventService;
+        vm.markers = [];
+        vm.setMarkers = setMarkers;
+        vm.setAnimation = setAnimation;
+        vm.stopAnimation = stopAnimation;
+
+        vm.model.map = CreateMap(document.getElementById('map'),mapOptions);
+
+
+        if ($window.navigator.geolocation) {
+             $window.navigator.geolocation.getCurrentPosition(function(position) {
+                var pos = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+
+                if(vm.model.map !== {})
+                    vm.model.map.setCenter(pos);
+            }, function() {
+                handleLocationError(true,vm.model.map.getCenter());
+            });
+        } else {
+        // Browser doesn't support Geolocation
+            handleLocationError(false,vm.model.map.getCenter());
+        }
+
+
+        function handleLocationError(browserHasGeolocation, pos) {
+            var infoWindow = new google.maps.InfoWindow({map: vm.model.map});
+            infoWindow.setPosition(pos);
+            infoWindow.setContent(browserHasGeolocation ?
+                'Error: The Geolocation service failed.' :
+                'Error: Your browser doesn\'t support geolocation.');
+        }
+        function CreateMap(element,options)
+        {
+            var map = new google.maps.Map(element,options);
+            return map;
+        }
+
+        function setMarkers(map,data){
+            setAllMarkers(null);
+            vm.markers = [];
+            for(var i = 0;i < data.length;i++){
+                var myLatLng={lat:data[i].geometry.location.lat(),lng:data[i].geometry.location.lng()};
+                var marker = new google.maps.Marker({
+                    position:myLatLng,
+                });
+                marker.addListener('click',(function(i){
+                    return function(){
+                        vm.event.getDetail(vm.model.currentIndex,i);
+                    };
+                })(i));
+                vm.markers.push(marker);
+
+            }
+            setAllMarkers(map);
+        }
+        function setAllMarkers(map){
+            for(var i = 0;i < vm.markers.length;i++)
+            {
+                vm.markers[i].setMap(map);
+            }
+        }
+        function setAnimation(index){
+            vm.markers[index].setAnimation(google.maps.Animation.BOUNCE);
+        }
+        function stopAnimation(index){
+            vm.markers[index].setAnimation(null);
+        }
+        $rootScope.$on('setMarkers',function(event,data){
+            vm.setMarkers(vm.model.map,data.data);
+        });
+        $rootScope.$on('setAnimation',function(event,data)
+        {
+            vm.setAnimation(data.index);
+        });
+        $rootScope.$on('stopAnimation',function(event,data){
+            vm.stopAnimation(data.index);
+        });
+        $rootScope.$on('setCenter',function(event,data){
+            vm.model.map.panTo(data.geolocation);
+            vm.model.map.setZoom(11);
+        });
+        $rootScope.$on('setMapCenter',function(event,data){
+            vm.model.map.panTo(data.geolocation);
+            vm.model.map.setZoom(16);
+        });
+
+
+
+    }
 })();

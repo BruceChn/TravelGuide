@@ -1,11 +1,11 @@
 
  <ul id = "attractionList" ng-if="atCtrl.model.isZeroData  === 2" >
-    <li ng-repeat = "attraction in ($parent.results[$parent.model.currentIndex] = atCtrl.model.data)">
+    <li ng-repeat = "attraction in ($parent.model.results[$parent.model.currentIndex] = atCtrl.model.data)">
         <attraction-section name = "{{attraction.name}}" rating = "{{attraction.rating}}" address = "{{attraction.formatted_address}}"
         index = "{{$index}}" ng-mouseenter="animate($index)" ng-mouseleave="stopAnimate($index)"
         page-index="$parent.model.currentIndex" click="event.getDetail(pageIndex,index)"></attraction-section>
     </li>
-    <li ng-if="results[model.currentIndex].length === 0">
+    <li ng-if="model.results[model.currentIndex].length === 0">
         <h2>Oops, there are no more results that match your search</h2>
         <p>
             Please go back to previous page
@@ -14,11 +14,11 @@
 </ul>
 <div class ="pane-section-pagination" ng-show = "atCtrl.show && atCtrl.model.isZeroData === 2">
     <div class = "pane-section-pagination-right" ng-cloak>
-        Showing results {{currentStart}} - {{results[model.currentIndex].length + currentStart - 1}}
+        Showing results {{model.currentStart}} - {{model.results[model.currentIndex].length + model.currentStart - 1}}
         <button class = "pane-section-pagination-button" id = "pane-section-pagination-button-prev"ng-click="previous()">
             <span class = "pane-section-pagination-prev"></span>
         </button>
-        <button ng-click="next()" ng-class = "['pane-section-pagination-button',{'pane-section-pagination-button-disabled':model.currentIndex === (results.length - 1) && !model.pagination.hasNextPage}]" id = "pane-section-pagination-button-next">
+        <button ng-click="next()" ng-class = "['pane-section-pagination-button',{'pane-section-pagination-button-disabled':model.currentIndex === (model.results.length - 1) && !model.pagination.hasNextPage}]" id = "pane-section-pagination-button-next">
             <span class = "pane-section-pagination-next" ></span>
         </button>
 
