@@ -73,13 +73,21 @@
                 scope.photos = [];
                 var reference,
                     photoUrl;
-                for(var i = 1;i < scope.model.detail.photos.length;i++)
+                if('photos' in scope.model.detail)
                 {
-                    photoUrl =  scope.model.detail.photos[i].getUrl({maxWidth:408});
+                    for(var i = 1;i < scope.model.detail.photos.length;i++)
+                    {
+                        photoUrl =  scope.model.detail.photos[i].getUrl({maxWidth:408});
+                        scope.photos.push(photoUrl);
+                    }
+                    photoUrl =  scope.model.detail.photos[0].getUrl({maxWidth:408});
                     scope.photos.push(photoUrl);
                 }
-                photoUrl =  scope.model.detail.photos[0].getUrl({maxWidth:408});
-                scope.photos.push(photoUrl);
+                else
+                {
+                    console.log("ishere");
+                    scope.photos.push('img/img_not_available.jpg');
+                }
             }
 
         }
