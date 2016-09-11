@@ -1,7 +1,7 @@
 
  <ul id = "attractionList" ng-if="atCtrl.model.isZeroData  === 2" >
     <li ng-repeat = "attraction in ($parent.results[$parent.model.currentIndex] = atCtrl.model.data)">
-        <attraction-section name = "{{attraction.name}}" rating = "{{attraction.rating}}" location = "{{attraction.formatted_address}}"
+        <attraction-section name = "{{attraction.name}}" rating = "{{attraction.rating}}" address = "{{attraction.formatted_address}}"
         index = "{{$index}}" ng-mouseenter="animate($index)" ng-mouseleave="stopAnimate($index)"
         page-index="$parent.model.currentIndex" click="getDetail(pageIndex,index)"></attraction-section>
     </li>

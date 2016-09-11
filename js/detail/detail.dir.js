@@ -4,10 +4,10 @@
     'use strict';
 
     angular
-        .module('myApp')
+        .module('app.detail')
         .directive('detail',detail);
-    detail.$inject = ['$rootScope','location','$state'];
-    function detail($rootScope,location,$state){
+    detail.$inject = ['$rootScope','locationService','$state'];
+    function detail($rootScope,locationService,$state){
         var directive ={
             restrict:'E',
             scope:{
@@ -16,9 +16,9 @@
             templateUrl:"templates/detail.html"
         };
         function link(scope,element,attr){
-            scope.name = location.detail.name;
+
             scope.types = [];
-            scope.rating = location.detail.rating;
+            scope.model = locationService;
             scope.back = back;
 
             //set rating value and photo src url and set types
@@ -34,23 +34,23 @@
             }
             function back(){
                 $state.go('attraction');
-                $rootScope.$emit('setCenter',{position:{lat:location.data[0].geometry.location.lat,lng:location.data[0].geometry.location.lng}});
+                $rootScope.$emit('setCenter',{geolocation:{lat:scope.model.data[0].geometry.location.lat,lng:scope.model.data[0].geometry.location.lng}});
             }
             function setTypes(){
-                angular.forEach(location.detail.types,function(value)
+                angular.forEach(scope.model.detail.types,function(value)
                 {
                     if(value !== 'point_of_interest')
                         scope.types.push(value);
                 });
             }
             function setRatings(){
-                var width =  (scope.rating/5.0 * 65).toString() + 'px';
+                var width =  (scope.model.detail.rating/5.0 * 65).toString() + 'px';
                 element.find('span.detail-nonEmptyStars').css('width',width);
             }
             function setImg(){
                 var url;
-                if('photos' in location.data[parseInt(attr.index)])
-                    scope.photo_reference= location.data[parseInt(attr.index)].photos[0].photo_reference;
+                if('photos' in scope.model.data[parseInt(attr.index)])
+                    scope.photo_reference= scope.model.data[parseInt(attr.index)].photos[0].photo_reference;
                 else {
                     scope.photo_reference = "unavailable";
                 }
@@ -68,22 +68,22 @@
                 element.find('img.header_img').attr('src',url);
             }
             function setWikipedia(){
-                element.find('div.panel-body').prepend(location.wikipedia.snippet);
-                scope.wikilink = "https://en.wikipedia.org/wiki/" + location.wikipedia.title;
+                element.find('div.panel-body').prepend(scope.model.wikipedia.snippet);
+                scope.wikilink = "https://en.wikipedia.org/wiki/" + scope.model.wikipedia.title;
             }
             function getDetailPhotos(){
                 scope.photos = [];
                 var reference,
                     photoUrl;
-                for(var i = 1;i < location.detail.photos.length;i++)
+                for(var i = 1;i < scope.model.detail.photos.length;i++)
                 {
-                    reference = location.detail.photos[i].photo_reference;
+                    reference = scope.model.detail.photos[i].photo_reference;
                     photoUrl = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=408&photoreference="+
                     reference+
                     "&key=AIzaSyB0e53B86tTI03YQGvN6gNA5s-MwTThHHY";
                     scope.photos.push(photoUrl);
                 }
-                reference = location.detail.photos[0].photo_reference;
+                reference = scope.model.detail.photos[0].photo_reference;
                 photoUrl = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=408&photoreference="+
                 reference+
                 "&key=AIzaSyB0e53B86tTI03YQGvN6gNA5s-MwTThHHY";

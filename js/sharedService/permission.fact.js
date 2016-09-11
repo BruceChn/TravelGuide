@@ -6,10 +6,10 @@
     'use strict';
 
     angular
-        .module('myApp')
-        .factory('permission',permission);
+        .module('app.service')
+        .factory('permissionService',permissionService);
 
-    function permission(){
+    function permissionService(){
         var model ={
             isAllowed:false
         };

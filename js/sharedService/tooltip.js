@@ -3,7 +3,7 @@
 (function(){
     'use strict';
     angular
-        .module('myApp')
+        .module('app.service')
         .directive('tooltip', function(){
             var directive = {
 

@@ -2,21 +2,21 @@
 (function(){
     'use strict';
     angular
-        .module('myApp')
+        .module('app.map')
         .controller('MapController',MapController);
 
     //var map = new google.maps.Map(document.getElementById('map'),mapOptions);
 
-    MapController.$inject = ['$window','location','$rootScope'];
+    MapController.$inject = ['$window','locationService','$rootScope'];
 
-    function MapController($window,location,$rootScope){
+    function MapController($window,locationService,$rootScope){
         var vm = this;
         var mapOptions = {
             center:{lat:37.397,lng:-121.644},
             zoom:11
         };
 
-        vm.model = location;
+        vm.model = locationService;
         vm.markers = [];
         vm.setMarkers = setMarkers;
         vm.setAnimation = setAnimation;
@@ -96,11 +96,11 @@
             vm.stopAnimation(data.index);
         });
         $rootScope.$on('setCenter',function(event,data){
-            vm.map.panTo(data.position);
+            vm.map.panTo(data.geolocation);
             vm.map.setZoom(11);
         });
         $rootScope.$on('setMapCenter',function(event,data){
-            vm.map.panTo(data.location);
+            vm.map.panTo(data.geolocation);
             vm.map.setZoom(16);
         });
 

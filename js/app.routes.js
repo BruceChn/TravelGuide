@@ -3,7 +3,7 @@
     'use strict';
 
     angular
-        .module('myApp')
+        .module('app')
         .config(config);
     function config($stateProvider,$urlRouterProvider)
     {
@@ -23,11 +23,11 @@
                     authenticate:authenticate
                 }
             });
-        authenticate.$inject = ['$q','permission','$state','$timeout'];
-        function authenticate($q,permission,$state,$timeout){
-            if(permission.isAllowed)
+        authenticate.$inject = ['$q','permissionService','$state','$timeout'];
+        function authenticate($q,permissionService,$state,$timeout){
+            if(permissionService.isAllowed)
             {
-                permission.isAllowed = false;
+                permissionService.isAllowed = false;
                 return $q.when();
             }
             else {

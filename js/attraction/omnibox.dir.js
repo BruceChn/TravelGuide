@@ -2,11 +2,11 @@
 
 (function(){
     angular
-        .module('myApp')
+        .module('app.attraction')
         .directive('omnibox',OmniBox);
 
-    OmniBox.$inject = ['location','$rootScope','$filter','$state'];
-    function OmniBox(location,$rootScope,$filter,$state){
+    OmniBox.$inject = ['locationService','$rootScope','$filter','$state'];
+    function OmniBox(locationService,$rootScope,$filter,$state){
         var directive ={
             restrict:'E',
             scope:{},
@@ -21,22 +21,22 @@
         return directive;
         function link(scope,element,attr){
             var vm = scope;
-            vm.model = location;
+            vm.model = locationService;
             vm.SearchAttraction = SearchAttraction;
             function SearchAttraction(input){
                 if(input !== '' && input !== undefined)
                 {
                     vm.model.currentIndex = 0;
-                    var promise = location.search(input);
+                    var promise = vm.model.search(input);
 
                     element.find('button.searchbtnbox').toggleClass('changed');
                     promise.then(function(){
                         $state.go('attraction',{});
                         element.find('button.searchbtnbox').toggleClass('changed');
                         //element.find('button#pane-section-pagination-button-prev').addClass('pane-section-pagination-button-disabled');
-                        $rootScope.$emit('setMarkers',{data:location.data});
+                        $rootScope.$emit('setMarkers',{data:vm.model.data});
                         $rootScope.$emit('reset',{});
-                        $rootScope.$emit('setCenter',{position:{lat:location.data[0].geometry.location.lat,lng:location.data[0].geometry.location.lng}});
+                        $rootScope.$emit('setCenter',{geolocation:{lat:vm.model.data[0].geometry.location.lat,lng:vm.model.data[0].geometry.location.lng}});
 
                     },function(error){
                         console.log(error);

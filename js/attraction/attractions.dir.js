@@ -3,12 +3,12 @@
 (function(){
     'use strict';
     angular
-        .module('myApp')
+        .module('app.attraction')
         .directive("attractions",Attractions);
 
     // define attractions directive
-    Attractions.$inject = ['location','$rootScope','$filter','$state','$q','permission'];
-    function Attractions(location,$rootScope,$filter,$state,$q,permission){
+    Attractions.$inject = ['locationService','$rootScope','$filter','$state','$q','permissionService'];
+    function Attractions(locationService,$rootScope,$filter,$state,$q,permissionService){
         return{
           restrict:"E",
           scope:{
@@ -22,7 +22,7 @@
         };
         function link(scope,element){
 
-            scope.model = location;
+            scope.model = locationService;
             scope.results = [];
             scope.currentStart = 1;
             scope.previous = previous;
@@ -56,7 +56,7 @@
                 scope.model.currentIndex--;
                 scope.model.data = scope.results[scope.model.currentIndex];
                 scope.currentStart = scope.currentStart - scope.results[scope.model.currentIndex].length;
-                $rootScope.$emit('setMarkers',{data:location.data});
+                $rootScope.$emit('setMarkers',{data:scope.model.data});
             }
             // go to the next page
             function next(){
@@ -66,13 +66,13 @@
                 {
                     angular.element('button.searchbtnbox').toggleClass('changed');
                     angular.element('div.section-refresh-overlay').css('visibility','visible');
-                    var promise = location.next();
+                    var promise = scope.model.next();
                     promise.then(function(response){
 
                         scope.currentStart += scope.results[scope.model.currentIndex - 1].length;
                         angular.element('button.searchbtnbox').toggleClass('changed');
                         angular.element('div.section-refresh-overlay').css('visibility','hidden');
-                        $rootScope.$emit('setMarkers',{data:location.data});
+                        $rootScope.$emit('setMarkers',{data:scope.model.data});
 
                     },function(error){
                         console.log(error);
@@ -82,7 +82,7 @@
                     scope.model.currentIndex++;
                     scope.model.data = scope.results[scope.model.currentIndex];
                     scope.currentStart += scope.results[scope.model.currentIndex - 1].length;
-                    $rootScope.$emit('setMarkers',{data:location.data});
+                    $rootScope.$emit('setMarkers',{data:scope.model.data});
                 }
             }
             function animate(index){
@@ -95,14 +95,14 @@
                 angular.element('button.searchbtnbox').toggleClass('changed');
                 angular.element('div.section-refresh-overlay').css('visibility','visible');
                 var photo_reference = ('photos' in scope.results[pageIndex][index]) ?scope.results[pageIndex][index].photos[0].photo_reference:"unavailable";
-                $rootScope.$emit('setMapCenter',{location:scope.results[pageIndex][index].geometry.location});
+                $rootScope.$emit('setMapCenter',{geolocation:scope.results[pageIndex][index].geometry.location});
 
                 var promise1 = scope.model.getDetail(scope.results[pageIndex][index].reference);
                 var promise2 = scope.model.getWikipedia(scope.results[pageIndex][index].name);
                 $q.all([promise1,promise2]).then(function(){
                     angular.element('div.section-refresh-overlay').css('visibility','hidden');
                     angular.element('button.searchbtnbox').toggleClass('changed');
-                    permission.isAllowed = true;
+                    permissionService.isAllowed = true;
                     $state.go('detail',{pageIndex:pageIndex,index:index});
                 });
 
@@ -111,10 +111,10 @@
         }
     }
 
-    AttractionController.$inject = ['location','$http'];
-    function AttractionController(location,$http){
+    AttractionController.$inject = ['locationService','$http'];
+    function AttractionController(locationService,$http){
         var vm = this;
-        vm.model = location;
+        vm.model = locationService;
         // function randomString(length, chars) {
         //     var result = '';
         //     for (var i = length; i > 0; --i) {

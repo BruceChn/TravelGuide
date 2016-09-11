@@ -6,7 +6,7 @@
     'use strict';
 
     angular
-        .module('myApp')
+        .module('app.service')
         .filter('nonagent',nonAgent);
 
     function nonAgent(){
@@ -14,7 +14,7 @@
 
         function exCludeAgent(data){
             var out = [];
-            
+
             for(var i = 0;i < data.length;i++)
             {
 

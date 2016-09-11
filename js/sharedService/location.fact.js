@@ -4,10 +4,10 @@
     'use strict';
 
     angular
-        .module('myApp')
-        .factory('location',location);
-    location.$inject = ['$http','$filter'];
-    function location($http,$filter){
+        .module('app.service')
+        .factory('locationService',locationService);
+    locationService.$inject = ['$http','$filter'];
+    function locationService($http,$filter){
         var model={
             data:[], // used to store the current search result
             isZeroData:0,// 0: don't displya result 1: no return result  2: show results;

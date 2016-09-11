@@ -4,13 +4,13 @@
     'use strict';
 
     angular
-        .module('myApp')
+        .module('app.attraction')
         .controller('SearchController',SearchController);
 
-    SearchController.$inject = ['location'];
-    function SearchController(location){
+    SearchController.$inject = ['locationService'];
+    function SearchController(locationService){
         var vm = this;
-        vm.model = location;
+        vm.model = locationService;
         vm.show = true;
         vm.toggle = toggle;
 
