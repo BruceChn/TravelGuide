@@ -11,6 +11,7 @@
         var directive ={
             restrict:'E',
             scope:{
+                index:'='
             },
             link:link,
             templateUrl:"templates/detail.html"
@@ -49,7 +50,7 @@
             }
             function setImg(){
                 var url;
-                if('photos' in scope.model.data[parseInt(attr.index)])
+                if('photos' in scope.model.data[scope.index])
                     scope.photo_reference= "available";
                 else {
                     scope.photo_reference = "unavailable";

@@ -7,8 +7,8 @@
         .module('app.attraction')
         .directive('attractionSection',attractionSection);
 
-    attractionSection.$inject = ['locationService','$http','$window'];
-    function attractionSection(locationService,$http,$window){
+    attractionSection.$inject = ['locationService','$http','$window','permissionService'];
+    function attractionSection(locationService,$http,$window,permissionService){
         var directive = {
             restrict:'E',
             templateUrl:"templates/attractionSection.html",
@@ -17,18 +17,19 @@
                 rating:'@',
                 address:'@',
                 pageIndex:'=',
-                click:'&'
+                click:'&',
+                index:'='
             },
-            // controller:SectionController,
-            // controllerAs:'SectCtrl',
-            // bindToController:true,
-            link:link
+            link:link,
+            controller:SectionController
         };
         function link(scope,element,attr)
         {
             scope.model = locationService;
+            scope.permissionService = permissionService;
             scope.show = show;
-            scope.index = parseInt(attr.index);
+
+
             activate();
 
             function activate(){
@@ -38,10 +39,9 @@
                 var css =  (scope.rating/5.0 * 65).toString() + 'px';
                 element.find("span.nonEmptyStars").css("width",css);
 
-
-                if ('photos' in scope.model.data[parseInt(attr.index)]){
+                if ('photos' in scope.model.data[scope.index]){
                     //var photo_reference = scope.model.data[parseInt(attr.index)].photos[0].photo_reference;
-                    var url = scope.model.data[parseInt(attr.index)].photos[0].getUrl({maxWidth:80});
+                    var url = scope.model.data[scope.index].photos[0].getUrl({maxWidth:80});
 
                     element.find("img.attraction_img").attr('src',url);
 
@@ -53,9 +53,9 @@
             function show(){
 
                 var img = new Image();
-                if ('photos' in scope.model.data[parseInt(attr.index)]){
+                if ('photos' in scope.model.data[scope.index]){
 
-                    img.src= scope.model.data[parseInt(attr.index)].photos[0].getUrl({maxWidth:$window.innerWidth * 0.9});
+                    img.src= scope.model.data[scope.index].photos[0].getUrl({maxWidth:Math.round($window.innerWidth * 0.9)});
                     img.onload = function(){
 
                         angular.element('#myModal').find('.modal-dialog').css('width',img.width);
@@ -76,6 +76,10 @@
 
         }
         return directive;
+    }
+    SectionController.$inject = ['$scope'];
+    function SectionController($scope){
+        this.index = $scope.index;
     }
     // SectionController.$inject = ['location'];
 

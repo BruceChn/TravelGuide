@@ -2,7 +2,7 @@
  <ul id = "attractionList" ng-if="atCtrl.model.isZeroData  === 2" >
     <li ng-repeat = "attraction in ($parent.model.results[$parent.model.currentIndex] = atCtrl.model.data)">
         <attraction-section name = "{{attraction.name}}" rating = "{{attraction.rating}}" address = "{{attraction.formatted_address}}"
-        index = "{{$index}}" ng-mouseenter="animate($index)" ng-mouseleave="stopAnimate($index)"
+        index = "$index" ng-mouseenter="animate($index)" ng-mouseleave="stopAnimate($index)"
         page-index="$parent.model.currentIndex" click="event.getDetail(pageIndex,index)"></attraction-section>
     </li>
     <li ng-if="model.results[model.currentIndex].length === 0">

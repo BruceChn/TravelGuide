@@ -1,11 +1,11 @@
 <div id = "omnibox">
     <div class = "searchmenu">
-        <button type="button" class="btn btn-default" aria-label="Left Align" id = "menubtn">
+        <button type="button" class="btn btn-default" aria-label="Left Align" id = "menubtn" ng-click = "enterPlanMode()">
                 <span class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></span>
         </button>
     </div>
     <div class = "search search-shadow">
-        <input type = "text" id = "searchinput" ng-model = "input"  ng-keypress="input !== ''&&$event.keyCode==13 &&SearchAttraction(input)"/>
+        <input type = "text" id = "searchinput" ng-model = "input"  placeholder="Search for cities..." ng-keypress="input !== ''&&$event.keyCode==13 &&searchAttraction(input)"/>
         <button class = "searchbtnbox color0" ng-click = "SearchAttraction(input)"
         data-toggle="tooltip" data-placement="bottom" title="search" tooltip></button>
     </div>

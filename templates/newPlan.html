@@ -1,0 +1,28 @@
+<div id = "dragbin" ng-if = "permission.planMode">
+    <ul id = "attractionList">
+        <li ng-repeat = "attraction in plan.current|filter:{isSelected:false}">
+            <attraction-section name = "{{attraction.name}}" rating = "{{attraction.rating}}" address = "{{attraction.formatted_address}}"
+            index = "attraction.id" ng-mouseenter="animate($index)" ng-mouseleave="stopAnimate($index)"draggable></attraction-section>
+        </li>
+    </ul>
+</div>
+<div id = "dropbin" ng-if = "permission.planMode">
+    <div class = "input-group" id = "plan-title">
+        <input type ="text" class="form-control" placeholder="Enter your plan title..." />
+        <span class="input-group-btn">
+            <button class="btn btn-primary" type = "button" id = "save">Save</button>
+            <button class="btn btn-danger" type = "button" id = "cancel" ng-click="cancel()">Cancel</button>
+        </span>
+    </div>
+    <ul id = "attractionList" droppable>
+        <li ng-repeat ="plan in plan.selected">
+            <attraction-section name = "{{plan.name}}" rating = "{{plan.rating}}" address = "{{plan.formatted_address}}" index = "plan.id" ng-click="cancelSelected(plan.id,$index)"></attraction-section>
+        </li>
+        <svg viewBox="0 0 428 100" ng-if="!permission.endHint">
+            <text fill = "blue" font-size ="20px">
+                <tspan x = "0" y = "1em" textLength ="428">Drag and drop your interested attractions</tspan>
+                <tspan x = "0" dy= "1em" textLength ="300">here and make your own plan</tspan>
+            </text>
+        </svg>
+    </ul>
+</div>

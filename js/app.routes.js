@@ -13,10 +13,11 @@
             .state('attraction',{
                 url:'/',
                 template:'<attractions show = "SearchCtrl.show" class = "attractions-container"></attractions>'
+
             })
             .state('detail',{
                 url:'/:pageIndex/:index',
-                template:'<detail index = "{{detailCtrl.index}}"><detail>',
+                template:'<detail index ="detailCtrl.index"><detail>',
                 controller:detailController,
                 controllerAs:'detailCtrl',
                 resolve:{

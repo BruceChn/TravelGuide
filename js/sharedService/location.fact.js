@@ -56,7 +56,6 @@
         }
         // get the details of the selected attraction
         function getDetail(id){
-
             var service = new google.maps.places.PlacesService(model.map);
             model.defer = $q.defer();
             var request = {

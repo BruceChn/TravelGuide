@@ -52,10 +52,11 @@ angular.module('app',[
             .state('attraction',{
                 url:'/',
                 template:'<attractions show = "SearchCtrl.show" class = "attractions-container"></attractions>'
+
             })
             .state('detail',{
                 url:'/:pageIndex/:index',
-                template:'<detail index = "{{detailCtrl.index}}"><detail>',
+                template:'<detail index ="detailCtrl.index"><detail>',
                 controller:detailController,
                 controllerAs:'detailCtrl',
                 resolve:{
@@ -115,12 +116,14 @@ angular.module('app',[
 
             scope.model = locationService;
             scope.event = eventService;
+            scope.permission = permissionService;
             scope.previous = previous;
             scope.next = next;
             scope.animate = animate;
             scope.stopAnimate = stopAnimate;
             scope.event.getDetail = getDetail;
             scope.event.reset = reset;
+
 
 
             //watch if in the first page
@@ -180,7 +183,7 @@ angular.module('app',[
                 $rootScope.$emit('stopAnimation',{index:index});
             }
             function getDetail(pageIndex,index){
-
+                if(scope.permission.planMode) return;
                 angular.element('button.searchbtnbox').toggleClass('changed');
                 angular.element('div.section-refresh-overlay').css('visibility','visible');
                 // var photo_id = ('photos' in scope.results[pageIndex][index]) ?scope.results[pageIndex][index].photos[0].photo_reference:"unavailable";
@@ -216,8 +219,8 @@ angular.module('app',[
         .module('app.attraction')
         .directive('attractionSection',attractionSection);
 
-    attractionSection.$inject = ['locationService','$http','$window'];
-    function attractionSection(locationService,$http,$window){
+    attractionSection.$inject = ['locationService','$http','$window','permissionService'];
+    function attractionSection(locationService,$http,$window,permissionService){
         var directive = {
             restrict:'E',
             templateUrl:"templates/attractionSection.html",
@@ -226,18 +229,19 @@ angular.module('app',[
                 rating:'@',
                 address:'@',
                 pageIndex:'=',
-                click:'&'
+                click:'&',
+                index:'='
             },
-            // controller:SectionController,
-            // controllerAs:'SectCtrl',
-            // bindToController:true,
-            link:link
+            link:link,
+            controller:SectionController
         };
         function link(scope,element,attr)
         {
             scope.model = locationService;
+            scope.permissionService = permissionService;
             scope.show = show;
-            scope.index = parseInt(attr.index);
+
+
             activate();
 
             function activate(){
@@ -247,10 +251,9 @@ angular.module('app',[
                 var css =  (scope.rating/5.0 * 65).toString() + 'px';
                 element.find("span.nonEmptyStars").css("width",css);
 
-
-                if ('photos' in scope.model.data[parseInt(attr.index)]){
+                if ('photos' in scope.model.data[scope.index]){
                     //var photo_reference = scope.model.data[parseInt(attr.index)].photos[0].photo_reference;
-                    var url = scope.model.data[parseInt(attr.index)].photos[0].getUrl({maxWidth:80});
+                    var url = scope.model.data[scope.index].photos[0].getUrl({maxWidth:80});
 
                     element.find("img.attraction_img").attr('src',url);
 
@@ -262,9 +265,9 @@ angular.module('app',[
             function show(){
 
                 var img = new Image();
-                if ('photos' in scope.model.data[parseInt(attr.index)]){
+                if ('photos' in scope.model.data[scope.index]){
 
-                    img.src= scope.model.data[parseInt(attr.index)].photos[0].getUrl({maxWidth:$window.innerWidth * 0.9});
+                    img.src= scope.model.data[scope.index].photos[0].getUrl({maxWidth:Math.round($window.innerWidth * 0.9)});
                     img.onload = function(){
 
                         angular.element('#myModal').find('.modal-dialog').css('width',img.width);
@@ -286,6 +289,10 @@ angular.module('app',[
         }
         return directive;
     }
+    SectionController.$inject = ['$scope'];
+    function SectionController($scope){
+        this.index = $scope.index;
+    }
     // SectionController.$inject = ['location'];
 
 
@@ -306,8 +313,8 @@ angular.module('app',[
         .module('app.attraction')
         .directive('omnibox',OmniBox);
 
-    OmniBox.$inject = ['locationService','$rootScope','$filter','$state','eventService'];
-    function OmniBox(locationService,$rootScope,$filter,$state,eventService){
+    OmniBox.$inject = ['locationService','$rootScope','$filter','$state','eventService','permissionService','planService'];
+    function OmniBox(locationService,$rootScope,$filter,$state,eventService,permissionService,planService){
         var directive ={
             restrict:'E',
             scope:{},
@@ -324,8 +331,11 @@ angular.module('app',[
             var vm = scope;
             vm.model = locationService;
             vm.event = eventService;
-            vm.SearchAttraction = SearchAttraction;
-            function SearchAttraction(input){
+            vm.permission = permissionService;
+            vm.searchAttraction = searchAttraction;
+            vm.enterPlanMode = enterPlanMode;
+            vm.plan = planService;
+            function searchAttraction(input){
                 if(input !== '' && input !== undefined)
                 {
                     vm.model.currentIndex = 0;
@@ -347,48 +357,23 @@ angular.module('app',[
 
                 }
             }
-        //     var randomString = function (length, chars) {
-        //   var result = '';
-        //   for (var i = length; i > 0; --i) {
-        //     result += chars[Math.round(Math.random() * (chars.length - 1))];
-        //   }
-        //   return result;
-        // };
-        //     var options = {
-        //         encodeSignature: true // will encode the signature following the RFC 3986 Spec by default
-        //     };
-        //     var params={
-        //         location:'San+Jose',
-        //         term:'Emma Prusch Farm Park',
-        //         oauth_consumer_key:'b2G0vHIw1gVt93iGcS6oFQ',
-        //         oauth_token:'GbTx68VEu2xMFz6niwbn1R1GcxMGMYCk',
-        //         oauth_signature_method: "HMAC-SHA1",
-        //         oauth_timestamp: new Date().getTime(),
-        //         oauth_nonce: randomString(32, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'),
-        //
-        //     };
-        //     var ConsumerSecret = 'RRSvLYsj1-jfW9V7NqquNxcAjQg';
-        //     var TokenSecret = 'E3FVhEOGrSY6RrhA68ZmpDyHf_4';
-        //
-        //     var oauth_signature = oauthSignature.generate('GET',"https://api.yelp.com/v2/search",params,ConsumerSecret,TokenSecret,options);
-        //     params.oauth_signature = oauth_signature;
-        //     $http({
-        //         url:"https://api.yelp.com/v2/search",
-        //         method:'GET',
-        //         params:params
-        //     }).then(function(response){
-        //         console.log(response);
-        //     });
+            function enterPlanMode(){
+                vm.permission.planMode = true;
+                vm.permission.endHint = false;
+                angular.copy(vm.model.data,vm.plan.current);
 
+                for(var i = 0;i < vm.plan.current.length;i++)
+                {
+                    vm.plan.current[i].id = i;
+                    vm.plan.current[i].isSelected = false;
+                }
 
+                angular.element('.plan-overlay').css('visibility','visible');
+
+            }
         }
     }
 })();
-
-
-
-    //     }
-    // }
 
 // searchCtrl.ctrl.js
 
@@ -442,6 +427,7 @@ angular.module('app',[
         var directive ={
             restrict:'E',
             scope:{
+                index:'='
             },
             link:link,
             templateUrl:"templates/detail.html"
@@ -480,7 +466,7 @@ angular.module('app',[
             }
             function setImg(){
                 var url;
-                if('photos' in scope.model.data[parseInt(attr.index)])
+                if('photos' in scope.model.data[scope.index])
                     scope.photo_reference= "available";
                 else {
                     scope.photo_reference = "unavailable";
@@ -524,228 +510,6 @@ angular.module('app',[
         }
         return directive;
     }
-})();
-
-(function(){
-    'use strict';
-    angular
-        .module('app.service')
-        .factory('eventService',eventService);
-
-    function eventService(){
-        var model = {
-            getDetail:{},
-            reset:{}
-        };
-        return model;
-    }
-})();
-
-//location.fact.js
-
-(function(){
-    'use strict';
-
-    angular
-        .module('app.service')
-        .factory('locationService',locationService);
-    locationService.$inject = ['$http','$filter','$q','$timeout'];
-    function locationService($http,$filter,$q,$timeout){
-        var model={
-            data:[],// used to store the current search result
-            results:[], //used to store all the results
-            isZeroData:0,// 0: don't displya result 1: no return result  2: show results;
-            currentIndex:0, // the current index of the page
-            currentStart:1,
-            pagination:{}, // store the next page token used to query next page
-            input:"", // the search input
-            detail:{}, //store the results of query detail
-            wikipedia:{}, // store the results of query wikipedia
-            map:{},
-            search:search,
-            next:next,
-            getDetail:getDetail,
-            getWikipedia:getWikipedia
-
-        };
-
-
-        return model;
-        // search Input
-        function search(input){
-            model.currentIndex = 0;
-            model.input = input;
-            var url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=attraction+in+" +
-                model.input + "&key=AIzaSyB0e53B86tTI03YQGvN6gNA5s-MwTThHHY";
-            var request ={
-                query:'attraction in'+input
-            };
-            var service = new google.maps.places.PlacesService(model.map);
-            model.defer = $q.defer();
-            service.textSearch(request,callback);
-            return model.defer.promise;
-
-        }
-        // get the next list results
-        function next(){
-            model.defer = $q.defer();
-            if(model.pagination.hasNextPage)
-            {
-                model.currentIndex++;
-                model.pagination.nextPage();
-
-            }
-            return model.defer.promise;
-        }
-        // get the details of the selected attraction
-        function getDetail(id){
-
-            var service = new google.maps.places.PlacesService(model.map);
-            model.defer = $q.defer();
-            var request = {
-                placeId:id
-            };
-            service.getDetails(request,callback);
-
-            function callback(place,status){
-                if (status == google.maps.places.PlacesServiceStatus.OK) {
-                    model.detail = place;
-                    model.defer.resolve();
-                }
-                else{
-                    model.defer.reject("can't find the place details");
-                }
-            }
-            return model.defer.promise;
-        }
-        //get the wikipedia result of the selected attraction
-        function getWikipedia(title){
-            var url = "https://en.wikipedia.org/w/api.php?"+
-            "action=query&format=json&prop=&list=search&meta=&utf8=1&srsearch="+ title +
-            "&srlimit=1&srprop=sectionsnippet%7Csnippet%7Ctitlesnippet&srinterwiki=1&callback=JSON_CALLBACK";
-            return $http.jsonp(url)
-                .then(function(response){
-                    model.wikipedia = response.data.query.search[0];
-                });
-        }
-        function callback(results,status,pagination){
-
-            if (status == google.maps.places.PlacesServiceStatus.OK) {
-
-                model.data = $filter('orderBy')($filter('nonagent')(results),'-rating');
-
-                model.pagination = pagination;
-                model.isZeroData = (results.length === 0)?1:2;
-                model.defer.resolve();
-            }
-            else {
-                model.defer.reject("Can't get the result");
-            }
-
-
-        }
-
-
-
-    }
-})();
-
-//nonAgent.filter.js
-
-// filter used to eliminate the travel_agency results from google search
-//update: used it to eliminate non-rating results also
-(function(){
-    'use strict';
-
-    angular
-        .module('app.service')
-        .filter('nonagent',nonAgent);
-
-    function nonAgent(){
-        return exCludeAgent;
-
-        function exCludeAgent(data){
-            var out = [];
-
-            for(var i = 0;i < data.length;i++)
-            {
-
-                if(data[i].types.indexOf("travel_agency") === -1 && ('rating' in data[i]))
-                {
-                    out.push(data[i]);
-                }
-            }
-
-            return out;
-        }
-    }
-})();
-
-//permission.fact.js
-
-//use this service to make sure that direct access to the detail view by typing in the url
-
-(function(){
-    'use strict';
-
-    angular
-        .module('app.service')
-        .factory('permissionService',permissionService);
-
-    function permissionService(){
-        var model ={
-            isAllowed:false
-        };
-        return model;
-    }
-})();
-
-/*imgViewer.dir.js*/
-(function(){
-    'use strict';
-
-    angular
-        .module('app.widget')
-        .directive('imgViewer',imgViewer);
-
-    function imgViewer(){
-        var dir = {
-            restrict:'E',
-            // link:link,
-            templateUrl:'templates/imgViewer.html',
-        };
-
-        return dir;
-    }
-
-
-
-})();
-
-/*tooltip.js*/
-
-(function(){
-    'use strict';
-    angular
-        .module('app.widget')
-        .directive('tooltip', function(){
-            var directive = {
-
-                restrict: 'A',
-                link:link
-            };
-            return directive;
-            function link(scope,element){
-                    $(element).hover(function(){
-                        // on mouseenter
-                        $(element).tooltip('show');
-                    }, function(){
-                        // on mouseleave
-                        $(element).tooltip('hide');
-                    });
-
-            }
-        });
 })();
 
 //mapCtrl.ctrl.js
@@ -859,4 +623,393 @@ angular.module('app',[
 
 
     }
+})();
+
+//drag.directive.js
+
+(function(){
+    'use strict';
+
+    angular
+        .module('app.plan')
+        .directive('draggable',draggable);
+
+    function draggable(){
+        var directive = {
+            restrict:'A',
+            link:link,
+            require:'attractionSection'
+        };
+
+        return directive;
+        function link(scope,element,attr,ctrl){
+            var el = element[0];
+            el.draggable = true;
+            el.addEventListener(
+                'dragstart',
+                function(e){
+                    e.dataTransfer.effectAllowed ='move';
+                    e.dataTransfer.setData('id',ctrl.index);
+                    this.classList.add('drag');
+                    return false;
+                },
+                false
+            );
+            el.addEventListener(
+                'dragend',
+                function(e){
+                    this.classList.remove('drag');
+                    return false;
+                },
+                false
+            );
+        }
+    }
+})();
+
+(function(){
+    'use strict';
+
+    angular
+        .module('app.plan')
+        .directive('droppable',droppable);
+
+    droppable.$inject=['planService','permissionService'];
+    function droppable(planService,permissionService){
+        var directive = {
+            restrict:'A',
+            link:link
+        };
+
+        return directive;
+
+        function link(scope,element){
+            var el = element[0];
+            scope.plan =  planService;
+            scope.permission = permissionService;
+            el.addEventListener(
+                'dragover',
+                function(e){
+                    e.dataTransfer.dropEffect = 'move';
+                    if(e.preventDefault)
+                        e.preventDefault();
+                    this.classList.add('over');
+                    return false;
+                },
+                false
+            );
+            el.addEventListener(
+                'dragenter',
+                function(e) {
+                    this.classList.add('over');
+                    return false;
+                },
+                false
+            );
+
+            el.addEventListener(
+                'dragleave',
+                function(e) {
+                    this.classList.remove('over');
+                    return false;
+                },
+                false
+
+            );
+            el.addEventListener(
+                'drop',
+                function(e){
+                    if(e.stopPropagation)
+                        e.stopPropagation();
+                    this.classList.remove('over');
+                    var id = e.dataTransfer.getData('id');
+                    scope.permission.endHint = true;
+                    scope.plan.current[id].isSelected = true;
+                    scope.plan.selected.push(scope.plan.current[id]);
+                }
+            );
+        }
+    }
+})();
+
+//newPlan.dir.js
+(function(){
+    'use strict';
+
+    angular
+        .module('app.plan')
+        .directive('newPlan',newPlan);
+
+    newPlan.$inject = ['locationService','planService','permissionService'];
+    function newPlan(locationService,planService,permissionService){
+        var directive ={
+            restrict:'E',
+            link:link,
+            templateUrl:"templates/newPlan.html"
+        };
+        return directive;
+
+        function link(scope,element){
+            scope.plan = planService;
+            scope.location = locationService;
+            scope.permission = permissionService;
+            scope.cancel = cancel;
+            scope.cancelSelected = cancelSelected;
+
+            function cancel(){
+                scope.permission.planMode = false;
+                angular.element('.plan-overlay').css('visibility','hidden');
+                scope.plan.current = [];
+                scope.plan.selected = [];
+            }
+
+            function cancelSelected(id,id2){
+                scope.plan.current[id].isSelected = false;
+                scope.plan.selected.splice(id2,1);
+            }
+
+
+        }
+    }
+})();
+
+//plan.factory.js
+
+(function(){
+    'use strict';
+
+    angular
+        .module('app.plan')
+        .factory('planService',planService);
+
+    function planService(){
+        var model={
+            current:[],
+            selected:[]
+        };
+        return model;
+    }
+})();
+
+(function(){
+    'use strict';
+    angular
+        .module('app.service')
+        .factory('eventService',eventService);
+
+    function eventService(){
+        var model = {
+            getDetail:{},
+            reset:{}
+        };
+        return model;
+    }
+})();
+
+//location.fact.js
+
+(function(){
+    'use strict';
+
+    angular
+        .module('app.service')
+        .factory('locationService',locationService);
+    locationService.$inject = ['$http','$filter','$q','$timeout'];
+    function locationService($http,$filter,$q,$timeout){
+        var model={
+            data:[],// used to store the current search result
+            results:[], //used to store all the results
+            isZeroData:0,// 0: don't displya result 1: no return result  2: show results;
+            currentIndex:0, // the current index of the page
+            currentStart:1,
+            pagination:{}, // store the next page token used to query next page
+            input:"", // the search input
+            detail:{}, //store the results of query detail
+            wikipedia:{}, // store the results of query wikipedia
+            map:{},
+            search:search,
+            next:next,
+            getDetail:getDetail,
+            getWikipedia:getWikipedia
+
+        };
+
+
+        return model;
+        // search Input
+        function search(input){
+            model.currentIndex = 0;
+            model.input = input;
+            var url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=attraction+in+" +
+                model.input + "&key=AIzaSyB0e53B86tTI03YQGvN6gNA5s-MwTThHHY";
+            var request ={
+                query:'attraction in'+input
+            };
+            var service = new google.maps.places.PlacesService(model.map);
+            model.defer = $q.defer();
+            service.textSearch(request,callback);
+            return model.defer.promise;
+
+        }
+        // get the next list results
+        function next(){
+            model.defer = $q.defer();
+            if(model.pagination.hasNextPage)
+            {
+                model.currentIndex++;
+                model.pagination.nextPage();
+
+            }
+            return model.defer.promise;
+        }
+        // get the details of the selected attraction
+        function getDetail(id){
+            var service = new google.maps.places.PlacesService(model.map);
+            model.defer = $q.defer();
+            var request = {
+                placeId:id
+            };
+            service.getDetails(request,callback);
+
+            function callback(place,status){
+                if (status == google.maps.places.PlacesServiceStatus.OK) {
+                    model.detail = place;
+                    model.defer.resolve();
+                }
+                else{
+                    model.defer.reject("can't find the place details");
+                }
+            }
+            return model.defer.promise;
+        }
+        //get the wikipedia result of the selected attraction
+        function getWikipedia(title){
+            var url = "https://en.wikipedia.org/w/api.php?"+
+            "action=query&format=json&prop=&list=search&meta=&utf8=1&srsearch="+ title +
+            "&srlimit=1&srprop=sectionsnippet%7Csnippet%7Ctitlesnippet&srinterwiki=1&callback=JSON_CALLBACK";
+            return $http.jsonp(url)
+                .then(function(response){
+                    model.wikipedia = response.data.query.search[0];
+                });
+        }
+        function callback(results,status,pagination){
+
+            if (status == google.maps.places.PlacesServiceStatus.OK) {
+
+                model.data = $filter('orderBy')($filter('nonagent')(results),'-rating');
+
+                model.pagination = pagination;
+                model.isZeroData = (results.length === 0)?1:2;
+                model.defer.resolve();
+            }
+            else {
+                model.defer.reject("Can't get the result");
+            }
+
+
+        }
+
+
+
+    }
+})();
+
+//nonAgent.filter.js
+
+// filter used to eliminate the travel_agency results from google search
+//update: used it to eliminate non-rating results also
+(function(){
+    'use strict';
+
+    angular
+        .module('app.service')
+        .filter('nonagent',nonAgent);
+
+    function nonAgent(){
+        return exCludeAgent;
+
+        function exCludeAgent(data){
+            var out = [];
+
+            for(var i = 0;i < data.length;i++)
+            {
+
+                if(data[i].types.indexOf("travel_agency") === -1 && ('rating' in data[i]))
+                {
+                    out.push(data[i]);
+                }
+            }
+
+            return out;
+        }
+    }
+})();
+
+//permission.fact.js
+
+//use this service to make sure that direct access to the detail view by typing in the url
+
+(function(){
+    'use strict';
+
+    angular
+        .module('app.service')
+        .factory('permissionService',permissionService);
+
+    function permissionService(){
+        var model ={
+            isAllowed:false,
+            planMode:false,
+            endHint:false
+        };
+        return model;
+    }
+})();
+
+/*imgViewer.dir.js*/
+(function(){
+    'use strict';
+
+    angular
+        .module('app.widget')
+        .directive('imgViewer',imgViewer);
+
+    function imgViewer(){
+        var dir = {
+            restrict:'E',
+            // link:link,
+            templateUrl:'templates/imgViewer.html',
+        };
+
+        return dir;
+    }
+
+
+
+})();
+
+/*tooltip.js*/
+
+(function(){
+    'use strict';
+    angular
+        .module('app.widget')
+        .directive('tooltip', function(){
+            var directive = {
+
+                restrict: 'A',
+                link:link
+            };
+            return directive;
+            function link(scope,element){
+                    $(element).hover(function(){
+                        // on mouseenter
+                        $(element).tooltip('show');
+                    }, function(){
+                        // on mouseleave
+                        $(element).tooltip('hide');
+                    });
+
+            }
+        });
 })();

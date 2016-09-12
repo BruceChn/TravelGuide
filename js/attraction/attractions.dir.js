@@ -24,12 +24,14 @@
 
             scope.model = locationService;
             scope.event = eventService;
+            scope.permission = permissionService;
             scope.previous = previous;
             scope.next = next;
             scope.animate = animate;
             scope.stopAnimate = stopAnimate;
             scope.event.getDetail = getDetail;
             scope.event.reset = reset;
+
 
 
             //watch if in the first page
@@ -89,7 +91,7 @@
                 $rootScope.$emit('stopAnimation',{index:index});
             }
             function getDetail(pageIndex,index){
-
+                if(scope.permission.planMode) return;
                 angular.element('button.searchbtnbox').toggleClass('changed');
                 angular.element('div.section-refresh-overlay').css('visibility','visible');
                 // var photo_id = ('photos' in scope.results[pageIndex][index]) ?scope.results[pageIndex][index].photos[0].photo_reference:"unavailable";

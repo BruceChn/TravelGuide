@@ -11,7 +11,9 @@
 
     function permissionService(){
         var model ={
-            isAllowed:false
+            isAllowed:false,
+            planMode:false,
+            endHint:false
         };
         return model;
     }
