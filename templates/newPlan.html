@@ -8,9 +8,9 @@
 </div>
 <div id = "dropbin" ng-if = "permission.planMode">
     <div class = "input-group" id = "plan-title">
-        <input type ="text" class="form-control" placeholder="Enter your plan title..." />
+        <input type ="text" class="form-control" placeholder="Enter your plan title..." ng-model="title" />
         <span class="input-group-btn">
-            <button class="btn btn-primary" type = "button" id = "save">Save</button>
+            <button class="btn btn-primary" type = "button" id = "save" ng-click ="save(title)">Save</button>
             <button class="btn btn-danger" type = "button" id = "cancel" ng-click="cancel()">Cancel</button>
         </span>
     </div>

@@ -1,12 +1,30 @@
 <div id = "omnibox">
-    <div class = "searchmenu">
-        <button type="button" class="btn btn-default" aria-label="Left Align" id = "menubtn" ng-click = "enterPlanMode()">
+    <div class = "dropdown searchmenu">
+        <button type="button" class="btn btn-default dropdown-toggle" aria-label="Left Align" id = "menubtn"
+        data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" >
                 <span class="glyphicon glyphicon-menu-hamburger" aria-hidden="true"></span>
         </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+            <li>
+                <a ng-class="{'disabled':model.isZeroData!==2}" ng-click="enterPlanMode()">Create new plan</a>
+            </li>
+            <li class = "dropdown-submenu">
+                <a>View created plans</a>
+                <ul class="dropdown-menu">
+                    <li ng-repeat = "(title,plan) in plan.createdPlans">
+                        <a tabindex="-1" href="#" ng-click="viewPlan(title)">{{title}}</a>
+                    </li>
+                </ul>
+            </li>
+            <li>
+                <a ng-click="clear()">Clear all plans</a>
+            </li>
+        </ul>
     </div>
     <div class = "search search-shadow">
-        <input type = "text" id = "searchinput" ng-model = "input"  placeholder="Search for cities..." ng-keypress="input !== ''&&$event.keyCode==13 &&searchAttraction(input)"/>
-        <button class = "searchbtnbox color0" ng-click = "SearchAttraction(input)"
+        <input type = "text" id = "searchinput" ng-model = "obCtrl.input"  placeholder="Enter the city to searchs..."
+        ng-keypress="input !== ''&&$event.keyCode==13 &&searchAttraction(obCtrl.input)"/>
+        <button class = "searchbtnbox color0" ng-click = "SearchAttraction(obCtrl.input)"
         data-toggle="tooltip" data-placement="bottom" title="search" tooltip></button>
     </div>
 </div>

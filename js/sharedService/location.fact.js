@@ -1,4 +1,5 @@
 //location.fact.js
+//this service is used to get the data and store data.
 
 (function(){
     'use strict';
@@ -22,18 +23,49 @@
             search:search,
             next:next,
             getDetail:getDetail,
-            getWikipedia:getWikipedia
+            getWikipedia:getWikipedia,
+            loadAttraction:loadAttraction
 
         };
 
 
         return model;
-        // search Input
+        //use stored the names of attractions in created plan to get results;
+        function loadAttraction(names){
+            model.data.splice(0,model.data.length);
+            model.promises = [];
+            model.defers = [];
+            var service = new google.maps.places.PlacesService(model.map);
+            for(var i = 0;i < names.length;i++){
+                model.defers.push($q.defer());
+                model.promises.push(model.defers[i].promise);
+                var request = {
+                    query:names[i]
+                };
+
+                service.textSearch(request,(function(index){
+
+                    return function(results,status,pagination){
+                        if (status == google.maps.places.PlacesServiceStatus.OK) {
+
+                            model.data.push(results[0]);
+                            model.pagination = pagination;
+                            model.isZeroData = 2;
+                            model.defers[index].resolve();
+                        }
+                        else {
+                            model.defers[index].reject("Can't get the result");
+                        }
+                    };
+                })(i));
+            }
+            return  $q.all(model.promises);
+        }
+        /// search Input
         function search(input){
             model.currentIndex = 0;
             model.input = input;
-            var url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=attraction+in+" +
-                model.input + "&key=AIzaSyB0e53B86tTI03YQGvN6gNA5s-MwTThHHY";
+
             var request ={
                 query:'attraction in'+input
             };
@@ -89,7 +121,6 @@
             if (status == google.maps.places.PlacesServiceStatus.OK) {
 
                 model.data = $filter('orderBy')($filter('nonagent')(results),'-rating');
-
                 model.pagination = pagination;
                 model.isZeroData = (results.length === 0)?1:2;
                 model.defer.resolve();

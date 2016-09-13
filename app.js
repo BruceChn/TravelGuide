@@ -57,12 +57,13 @@ angular.module('app',[
             .state('detail',{
                 url:'/:pageIndex/:index',
                 template:'<detail index ="detailCtrl.index"><detail>',
-                controller:detailController,
+                controller:DetailController,
                 controllerAs:'detailCtrl',
                 resolve:{
                     authenticate:authenticate
                 }
             });
+
         authenticate.$inject = ['$q','permissionService','$state','$timeout'];
         function authenticate($q,permissionService,$state,$timeout){
             if(permissionService.isAllowed)
@@ -80,13 +81,14 @@ angular.module('app',[
         }
     }
 
-    detailController.$inject = ['$stateParams'];
-    function detailController($stateParams,location){
+    DetailController.$inject = ['$stateParams'];
+    function DetailController($stateParams){
         var vm = this;
         vm.pageIndex = $stateParams.pageIndex;
         vm.index = $stateParams.index;
 
     }
+
 
 })();
 
@@ -254,9 +256,7 @@ angular.module('app',[
                 if ('photos' in scope.model.data[scope.index]){
                     //var photo_reference = scope.model.data[parseInt(attr.index)].photos[0].photo_reference;
                     var url = scope.model.data[scope.index].photos[0].getUrl({maxWidth:80});
-
                     element.find("img.attraction_img").attr('src',url);
-
                 }
                 else {
                     element.find("img.attraction_img").attr('src',"img/img_not_available.jpg");
@@ -319,22 +319,25 @@ angular.module('app',[
             restrict:'E',
             scope:{},
             templateUrl:"templates/omniBox.html",
-            // controller:OmniboxController,
-            // controllerAs:"obCtrl",
-            // bindToController:true,
+            controller:OmniboxController,
+            controllerAs:"obCtrl",
+            bindToController:true,
             link:link
 
 
         };
         return directive;
-        function link(scope,element,attr){
+        function link(scope,element,attr,ctrl){
             var vm = scope;
             vm.model = locationService;
             vm.event = eventService;
+            vm.plan = planService;
             vm.permission = permissionService;
             vm.searchAttraction = searchAttraction;
             vm.enterPlanMode = enterPlanMode;
-            vm.plan = planService;
+            vm.viewPlan = viewPlan;
+            vm.clear = clear;
+
             function searchAttraction(input){
                 if(input !== '' && input !== undefined)
                 {
@@ -371,7 +374,31 @@ angular.module('app',[
                 angular.element('.plan-overlay').css('visibility','visible');
 
             }
+
+            function clear(){
+                vm.plan.clear();
+            }
+            function viewPlan(title){
+                //vm.plan.createdPlans[title]
+
+                vm.model.currentIndex = 0;
+                element.find('button.searchbtnbox').toggleClass('changed');
+                var promise = vm.model.loadAttraction(vm.plan.createdPlans[title]);
+                promise.then(function(){
+                    ctrl.input = title;
+                    $state.go('attraction',{});
+                    element.find('button.searchbtnbox').toggleClass('changed');
+                    $rootScope.$emit('setMarkers',{data:vm.model.data});
+                    vm.event.reset();
+                    $rootScope.$emit('setCenter',{geolocation:{lat:vm.model.data[0].geometry.location.lat(),lng:vm.model.data[0].geometry.location.lng()}});
+                });
+                //vm.model.data = angular.copy(vm.plan.createdPlans[title]);
+            }
         }
+    }
+    OmniboxController.$injec = ['$scope'];
+    function OmniboxController($scope){
+        var vm = this;
     }
 })();
 
@@ -754,7 +781,9 @@ angular.module('app',[
             scope.location = locationService;
             scope.permission = permissionService;
             scope.cancel = cancel;
+            scope.save = save;
             scope.cancelSelected = cancelSelected;
+
 
             function cancel(){
                 scope.permission.planMode = false;
@@ -766,6 +795,20 @@ angular.module('app',[
             function cancelSelected(id,id2){
                 scope.plan.current[id].isSelected = false;
                 scope.plan.selected.splice(id2,1);
+            }
+            function save(title){
+                if(scope.plan.selected.length === 0 || typeof title === 'undefined' )
+                {
+                    console.log("ishere");
+                }
+                else{
+
+                    scope.permission.planMode = false;
+                    angular.element('.plan-overlay').css('visibility','hidden');
+                    scope.plan.save(title);
+                    scope.plan.current = [];
+                    scope.plan.selected = [];
+                }
             }
 
 
@@ -782,12 +825,30 @@ angular.module('app',[
         .module('app.plan')
         .factory('planService',planService);
 
-    function planService(){
+    planService.$inject = ['storageService'];
+    function planService(storageService){
+        var createdPlans = storageService.items;
         var model={
             current:[],
-            selected:[]
+            selected:[],
+            save:save,
+            createdPlans:createdPlans,
+            clear:clear
         };
         return model;
+
+        function save(title){
+            var names = [];
+            for(var i = 0;i < model.selected.length;i++)
+            {
+                names.push(model.selected[i].name);
+            }
+            storageService.setItem(title,names);
+        }
+
+        function clear(){
+            storageService.clear();
+        }
     }
 })();
 
@@ -807,6 +868,7 @@ angular.module('app',[
 })();
 
 //location.fact.js
+//this service is used to get the data and store data.
 
 (function(){
     'use strict';
@@ -830,18 +892,49 @@ angular.module('app',[
             search:search,
             next:next,
             getDetail:getDetail,
-            getWikipedia:getWikipedia
+            getWikipedia:getWikipedia,
+            loadAttraction:loadAttraction
 
         };
 
 
         return model;
-        // search Input
+        //use stored the names of attractions in created plan to get results;
+        function loadAttraction(names){
+            model.data.splice(0,model.data.length);
+            model.promises = [];
+            model.defers = [];
+            var service = new google.maps.places.PlacesService(model.map);
+            for(var i = 0;i < names.length;i++){
+                model.defers.push($q.defer());
+                model.promises.push(model.defers[i].promise);
+                var request = {
+                    query:names[i]
+                };
+
+                service.textSearch(request,(function(index){
+
+                    return function(results,status,pagination){
+                        if (status == google.maps.places.PlacesServiceStatus.OK) {
+
+                            model.data.push(results[0]);
+                            model.pagination = pagination;
+                            model.isZeroData = 2;
+                            model.defers[index].resolve();
+                        }
+                        else {
+                            model.defers[index].reject("Can't get the result");
+                        }
+                    };
+                })(i));
+            }
+            return  $q.all(model.promises);
+        }
+        /// search Input
         function search(input){
             model.currentIndex = 0;
             model.input = input;
-            var url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=attraction+in+" +
-                model.input + "&key=AIzaSyB0e53B86tTI03YQGvN6gNA5s-MwTThHHY";
+
             var request ={
                 query:'attraction in'+input
             };
@@ -897,7 +990,6 @@ angular.module('app',[
             if (status == google.maps.places.PlacesServiceStatus.OK) {
 
                 model.data = $filter('orderBy')($filter('nonagent')(results),'-rating');
-
                 model.pagination = pagination;
                 model.isZeroData = (results.length === 0)?1:2;
                 model.defer.resolve();
@@ -964,6 +1056,76 @@ angular.module('app',[
         };
         return model;
     }
+})();
+
+//storage.factory.js
+(function(){
+    'use strict';
+
+    angular
+        .module("app.service")
+        .factory('storageService',storageService);
+    storageService.$inject = ['storageKey','$window','$exceptionHandler'];
+    function storageService(storageKey,$window,$exceptionHandler){
+
+        var items = loadData();
+        var model = {
+            items:items,
+            getItem: getItem,
+            setItem: setItem,
+            getKeys: getKeys,
+            clear:clear
+        };
+        $window.addEventListener('beforeunload',persistData);
+        return model;
+
+        function loadData(){
+            try{
+                if(storageKey in $window.localStorage)
+                {
+                    var data = $window.localStorage.getItem(storageKey);
+                    $window.localStorage.removeItem(storageKey);
+                    return (angular.extend({},angular.fromJson(data)));
+                }
+
+            } catch ( localStorageError ) {
+                $exceptionHandler( localStorageError );
+            }
+            return ({});
+        }
+        function clear(){
+            items = {};
+        }
+        function getKeys(){
+
+            return Object.keys(items);
+        }
+        function setItem(key,value){
+
+            items[key] = angular.copy(value);
+
+        }
+        function getItem(key)
+        {
+            return (key in items)?angular.copy(items[key]):null;
+        }
+        function persistData()
+        {
+            try {
+                $window.localStorage.setItem( storageKey, angular.toJson( items ) );
+            } catch ( localStorageError ) {
+                $exceptionHandler( localStorageError );
+            }
+        }
+    }
+})();
+
+//storageKey.value.js
+(function(){
+
+    angular
+        .module('app.service')
+        .value('storageKey',"angularjs_travel_plan");
 })();
 
 /*imgViewer.dir.js*/

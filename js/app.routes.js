@@ -18,12 +18,13 @@
             .state('detail',{
                 url:'/:pageIndex/:index',
                 template:'<detail index ="detailCtrl.index"><detail>',
-                controller:detailController,
+                controller:DetailController,
                 controllerAs:'detailCtrl',
                 resolve:{
                     authenticate:authenticate
                 }
             });
+
         authenticate.$inject = ['$q','permissionService','$state','$timeout'];
         function authenticate($q,permissionService,$state,$timeout){
             if(permissionService.isAllowed)
@@ -41,12 +42,13 @@
         }
     }
 
-    detailController.$inject = ['$stateParams'];
-    function detailController($stateParams,location){
+    DetailController.$inject = ['$stateParams'];
+    function DetailController($stateParams){
         var vm = this;
         vm.pageIndex = $stateParams.pageIndex;
         vm.index = $stateParams.index;
 
     }
+
 
 })();

@@ -42,9 +42,7 @@
                 if ('photos' in scope.model.data[scope.index]){
                     //var photo_reference = scope.model.data[parseInt(attr.index)].photos[0].photo_reference;
                     var url = scope.model.data[scope.index].photos[0].getUrl({maxWidth:80});
-
                     element.find("img.attraction_img").attr('src',url);
-
                 }
                 else {
                     element.find("img.attraction_img").attr('src',"img/img_not_available.jpg");

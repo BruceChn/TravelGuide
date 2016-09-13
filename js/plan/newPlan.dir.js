@@ -20,7 +20,9 @@
             scope.location = locationService;
             scope.permission = permissionService;
             scope.cancel = cancel;
+            scope.save = save;
             scope.cancelSelected = cancelSelected;
+
 
             function cancel(){
                 scope.permission.planMode = false;
@@ -32,6 +34,20 @@
             function cancelSelected(id,id2){
                 scope.plan.current[id].isSelected = false;
                 scope.plan.selected.splice(id2,1);
+            }
+            function save(title){
+                if(scope.plan.selected.length === 0 || typeof title === 'undefined' )
+                {
+                    console.log("ishere");
+                }
+                else{
+
+                    scope.permission.planMode = false;
+                    angular.element('.plan-overlay').css('visibility','hidden');
+                    scope.plan.save(title);
+                    scope.plan.current = [];
+                    scope.plan.selected = [];
+                }
             }
 
 

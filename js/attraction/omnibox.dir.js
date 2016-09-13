@@ -11,22 +11,25 @@
             restrict:'E',
             scope:{},
             templateUrl:"templates/omniBox.html",
-            // controller:OmniboxController,
-            // controllerAs:"obCtrl",
-            // bindToController:true,
+            controller:OmniboxController,
+            controllerAs:"obCtrl",
+            bindToController:true,
             link:link
 
 
         };
         return directive;
-        function link(scope,element,attr){
+        function link(scope,element,attr,ctrl){
             var vm = scope;
             vm.model = locationService;
             vm.event = eventService;
+            vm.plan = planService;
             vm.permission = permissionService;
             vm.searchAttraction = searchAttraction;
             vm.enterPlanMode = enterPlanMode;
-            vm.plan = planService;
+            vm.viewPlan = viewPlan;
+            vm.clear = clear;
+
             function searchAttraction(input){
                 if(input !== '' && input !== undefined)
                 {
@@ -63,6 +66,30 @@
                 angular.element('.plan-overlay').css('visibility','visible');
 
             }
+
+            function clear(){
+                vm.plan.clear();
+            }
+            function viewPlan(title){
+                //vm.plan.createdPlans[title]
+
+                vm.model.currentIndex = 0;
+                element.find('button.searchbtnbox').toggleClass('changed');
+                var promise = vm.model.loadAttraction(vm.plan.createdPlans[title]);
+                promise.then(function(){
+                    ctrl.input = title;
+                    $state.go('attraction',{});
+                    element.find('button.searchbtnbox').toggleClass('changed');
+                    $rootScope.$emit('setMarkers',{data:vm.model.data});
+                    vm.event.reset();
+                    $rootScope.$emit('setCenter',{geolocation:{lat:vm.model.data[0].geometry.location.lat(),lng:vm.model.data[0].geometry.location.lng()}});
+                });
+                //vm.model.data = angular.copy(vm.plan.createdPlans[title]);
+            }
         }
+    }
+    OmniboxController.$injec = ['$scope'];
+    function OmniboxController($scope){
+        var vm = this;
     }
 })();
