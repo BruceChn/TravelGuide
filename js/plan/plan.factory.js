@@ -9,12 +9,12 @@
 
     planService.$inject = ['storageService'];
     function planService(storageService){
-        var createdPlans = storageService.items;
+
         var model={
             current:[],
             selected:[],
             save:save,
-            createdPlans:createdPlans,
+            createdPlans:storageService.items,
             clear:clear
         };
         return model;
@@ -30,6 +30,7 @@
 
         function clear(){
             storageService.clear();
+            model.createdPlans = {};
         }
     }
 })();

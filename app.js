@@ -377,6 +377,7 @@ angular.module('app',[
 
             function clear(){
                 vm.plan.clear();
+
             }
             function viewPlan(title){
                 //vm.plan.createdPlans[title]
@@ -827,12 +828,12 @@ angular.module('app',[
 
     planService.$inject = ['storageService'];
     function planService(storageService){
-        var createdPlans = storageService.items;
+
         var model={
             current:[],
             selected:[],
             save:save,
-            createdPlans:createdPlans,
+            createdPlans:storageService.items,
             clear:clear
         };
         return model;
@@ -848,6 +849,7 @@ angular.module('app',[
 
         function clear(){
             storageService.clear();
+            model.createdPlans = {};
         }
     }
 })();

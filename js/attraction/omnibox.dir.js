@@ -69,6 +69,7 @@
 
             function clear(){
                 vm.plan.clear();
+
             }
             function viewPlan(title){
                 //vm.plan.createdPlans[title]
