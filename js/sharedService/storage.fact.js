@@ -36,6 +36,7 @@
         }
         function clear(){
             items = {};
+            model.items = items;
         }
         function getKeys(){
 

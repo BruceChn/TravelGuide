@@ -873,11 +873,12 @@ angular.module('app',[
 
 
             storageService.setItem(title,names);
+
         }
         //clear all the selected plans
         function clear(){
             storageService.clear();
-            model.createdPlans = {};
+            model.createdPlans = storageService.items;
         }
     }
 })();
@@ -1131,6 +1132,7 @@ angular.module('app',[
         }
         function clear(){
             items = {};
+            model.items = items;
         }
         function getKeys(){
 
