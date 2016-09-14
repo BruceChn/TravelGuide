@@ -1,11 +1,10 @@
 //mapCtrl.ctrl.js
+//deal with the map manipulation
 (function(){
     'use strict';
     angular
         .module('app.map')
         .controller('MapController',MapController);
-
-    //var map = new google.maps.Map(document.getElementById('map'),mapOptions);
 
     MapController.$inject = ['$window','locationService','$rootScope','eventService'];
 
@@ -60,8 +59,9 @@
         function setMarkers(map,data){
             setAllMarkers(null);
             vm.markers = [];
-            for(var i = 0;i < data.length;i++){
-                var myLatLng={lat:data[i].geometry.location.lat(),lng:data[i].geometry.location.lng()};
+            data.map(function(result,i)
+            {
+                var myLatLng={lat:result.geometry.location.lat(),lng:result.geometry.location.lng()};
                 var marker = new google.maps.Marker({
                     position:myLatLng,
                 });
@@ -71,15 +71,18 @@
                     };
                 })(i));
                 vm.markers.push(marker);
+            });
 
-            }
+
+
             setAllMarkers(map);
         }
         function setAllMarkers(map){
-            for(var i = 0;i < vm.markers.length;i++)
+            vm.markers.map(function(marker)
             {
-                vm.markers[i].setMap(map);
-            }
+                marker.setMap(map);
+            });
+
         }
         function setAnimation(index){
             vm.markers[index].setAnimation(google.maps.Animation.BOUNCE);

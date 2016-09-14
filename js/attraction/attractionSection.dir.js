@@ -7,8 +7,8 @@
         .module('app.attraction')
         .directive('attractionSection',attractionSection);
 
-    attractionSection.$inject = ['locationService','$http','$window','permissionService'];
-    function attractionSection(locationService,$http,$window,permissionService){
+    attractionSection.$inject = ['locationService','$http','$window','permissionService','FlashService'];
+    function attractionSection(locationService,$http,$window,permissionService,FlashService){
         var directive = {
             restrict:'E',
             templateUrl:"templates/attractionSection.html",
@@ -31,16 +31,18 @@
 
 
             activate();
-
+            //initiation process
             function activate(){
                 setImg();
             }
+            //set the displayed image
             function setImg(){
                 var css =  (scope.rating/5.0 * 65).toString() + 'px';
                 element.find("span.nonEmptyStars").css("width",css);
 
+                //sometimes returned result doesnt include photo property
                 if ('photos' in scope.model.data[scope.index]){
-                    //var photo_reference = scope.model.data[parseInt(attr.index)].photos[0].photo_reference;
+
                     var url = scope.model.data[scope.index].photos[0].getUrl({maxWidth:80});
                     element.find("img.attraction_img").attr('src',url);
                 }
@@ -48,6 +50,7 @@
                     element.find("img.attraction_img").attr('src',"img/img_not_available.jpg");
                 }
             }
+            //image Viewer Zoom in the selected image
             function show(){
 
                 var img = new Image();
@@ -62,6 +65,7 @@
                     };
                 }
                 else {
+                    FlashService.create("Sorry,the image is not available!");
                     img.src = "img/img_not_available.jpg";
                     img.onload = function(){
 

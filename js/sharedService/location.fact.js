@@ -32,34 +32,37 @@
         return model;
         //use stored the names of attractions in created plan to get results;
         function loadAttraction(names){
-            model.data.splice(0,model.data.length);
+
             model.promises = [];
-            model.defers = [];
+            var newData = [];
             var service = new google.maps.places.PlacesService(model.map);
-            for(var i = 0;i < names.length;i++){
-                model.defers.push($q.defer());
-                model.promises.push(model.defers[i].promise);
+            names.map(function(name)
+            {
+                var defer = $q.defer();
+                model.promises.push(defer.promise);
                 var request = {
-                    query:names[i]
+                    query:name
                 };
 
-                service.textSearch(request,(function(index){
+                service.textSearch(request,(function(defer){
 
                     return function(results,status,pagination){
                         if (status == google.maps.places.PlacesServiceStatus.OK) {
 
-                            model.data.push(results[0]);
+                            newData.push(results[0]);
                             model.pagination = pagination;
-                            model.isZeroData = 2;
-                            model.defers[index].resolve();
+
+                            defer.resolve();
                         }
                         else {
-                            model.defers[index].reject("Can't get the result");
+                            defer.reject("Can't get the result");
                         }
                     };
-                })(i));
-            }
-            return  $q.all(model.promises);
+                })(defer));
+            });
+            return  $q.all(model.promises).then(function(){
+                model.data = newData;
+            });
         }
         /// search Input
         function search(input){

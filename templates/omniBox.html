@@ -23,8 +23,8 @@
     </div>
     <div class = "search search-shadow">
         <input type = "text" id = "searchinput" ng-model = "obCtrl.input"  placeholder="Enter the city to searchs..."
-        ng-keypress="input !== ''&&$event.keyCode==13 &&searchAttraction(obCtrl.input)"/>
-        <button class = "searchbtnbox color0" ng-click = "SearchAttraction(obCtrl.input)"
+        ng-keypress="$event.keyCode==13 &&searchAttraction(obCtrl.input)"/>
+        <button class = "searchbtnbox color0" ng-click = "searchAttraction(obCtrl.input)"
         data-toggle="tooltip" data-placement="bottom" title="search" tooltip></button>
     </div>
 </div>

@@ -88,7 +88,20 @@ html,body{
     right:0px;
     z-index:10;
 }
-
+flash{
+    position:fixed;
+    z-index:2000;
+    top:20px;
+    left:50%;
+    transform:translateX(-50%);
+}
+#flash.ng-enter{
+    transition:0.5s linear all;
+    transform:translateY(-20px) translateY(-100%);
+}
+#flash.ng-enter.ng-enter-active{
+    transform:translateY(0%);
+}
 /* Ch-02 Map Division##############################################################################################*/
 #map{
   position:absolute;

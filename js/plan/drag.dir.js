@@ -1,5 +1,5 @@
 //drag.directive.js
-
+// nake a element draggable
 (function(){
     'use strict';
 

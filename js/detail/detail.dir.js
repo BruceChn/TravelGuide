@@ -33,6 +33,7 @@
                 getDetailPhotos();
 
             }
+            // return attracton page
             function back(){
                 $state.go('attraction');
                 $rootScope.$emit('setCenter',{geolocation:{lat:scope.model.data[0].geometry.location.lat(),lng:scope.model.data[0].geometry.location.lng()}});

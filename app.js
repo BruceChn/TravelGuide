@@ -9,7 +9,8 @@ angular.module('app.core',[
     /*shared service*/
     'app.service'
 ]);
-angular.module('app.widget',[]);
+angular.module('app.widget',['ngAnimate']);
+
 angular.module('app.map',[
     'app.core',
     'app.widget'
@@ -178,13 +179,17 @@ angular.module('app',[
                     $rootScope.$emit('setMarkers',{data:scope.model.data});
                 }
             }
+            //start the drop animation on certain mark
             function animate(index){
                 $rootScope.$emit('setAnimation',{index:index});
             }
+            //stop the animation
             function stopAnimate(index){
                 $rootScope.$emit('stopAnimation',{index:index});
             }
+            //
             function getDetail(pageIndex,index){
+                //when in new plan mode, enter the detail page is not allowed
                 if(scope.permission.planMode) return;
                 angular.element('button.searchbtnbox').toggleClass('changed');
                 angular.element('div.section-refresh-overlay').css('visibility','visible');
@@ -204,7 +209,7 @@ angular.module('app',[
 
         }
     }
-
+    
     AttractionController.$inject = ['locationService','$http'];
     function AttractionController(locationService,$http){
         var vm = this;
@@ -221,8 +226,8 @@ angular.module('app',[
         .module('app.attraction')
         .directive('attractionSection',attractionSection);
 
-    attractionSection.$inject = ['locationService','$http','$window','permissionService'];
-    function attractionSection(locationService,$http,$window,permissionService){
+    attractionSection.$inject = ['locationService','$http','$window','permissionService','FlashService'];
+    function attractionSection(locationService,$http,$window,permissionService,FlashService){
         var directive = {
             restrict:'E',
             templateUrl:"templates/attractionSection.html",
@@ -245,16 +250,18 @@ angular.module('app',[
 
 
             activate();
-
+            //initiation process
             function activate(){
                 setImg();
             }
+            //set the displayed image
             function setImg(){
                 var css =  (scope.rating/5.0 * 65).toString() + 'px';
                 element.find("span.nonEmptyStars").css("width",css);
 
+                //sometimes returned result doesnt include photo property
                 if ('photos' in scope.model.data[scope.index]){
-                    //var photo_reference = scope.model.data[parseInt(attr.index)].photos[0].photo_reference;
+
                     var url = scope.model.data[scope.index].photos[0].getUrl({maxWidth:80});
                     element.find("img.attraction_img").attr('src',url);
                 }
@@ -262,6 +269,7 @@ angular.module('app',[
                     element.find("img.attraction_img").attr('src',"img/img_not_available.jpg");
                 }
             }
+            //image Viewer Zoom in the selected image
             function show(){
 
                 var img = new Image();
@@ -276,6 +284,7 @@ angular.module('app',[
                     };
                 }
                 else {
+                    FlashService.create("Sorry,the image is not available!");
                     img.src = "img/img_not_available.jpg";
                     img.onload = function(){
 
@@ -307,14 +316,14 @@ angular.module('app',[
 })();
 
 //omnibox.dir.js
-
+//the searchbox directive
 (function(){
     angular
         .module('app.attraction')
         .directive('omnibox',OmniBox);
 
-    OmniBox.$inject = ['locationService','$rootScope','$filter','$state','eventService','permissionService','planService'];
-    function OmniBox(locationService,$rootScope,$filter,$state,eventService,permissionService,planService){
+    OmniBox.$inject = ['locationService','$rootScope','$filter','$state','eventService','permissionService','planService','FlashService'];
+    function OmniBox(locationService,$rootScope,$filter,$state,eventService,permissionService,planService,FlashService){
         var directive ={
             restrict:'E',
             scope:{},
@@ -337,10 +346,12 @@ angular.module('app',[
             vm.enterPlanMode = enterPlanMode;
             vm.viewPlan = viewPlan;
             vm.clear = clear;
-
+            //search attractions based on input;
             function searchAttraction(input){
-                if(input !== '' && input !== undefined)
+
+                if(typeof input !== 'undefined' && input !== '')
                 {
+
                     vm.model.currentIndex = 0;
                     element.find('button.searchbtnbox').toggleClass('changed');
                     var promise = vm.model.search(input);
@@ -359,7 +370,11 @@ angular.module('app',[
                     });
 
                 }
+                else {
+                    FlashService.create('The input cannot be empty!');
+                }
             }
+            // create new plan mode
             function enterPlanMode(){
                 vm.permission.planMode = true;
                 vm.permission.endHint = false;
@@ -374,13 +389,13 @@ angular.module('app',[
                 angular.element('.plan-overlay').css('visibility','visible');
 
             }
-
+            // clear all existed plans
             function clear(){
                 vm.plan.clear();
 
             }
+            //view selected plans
             function viewPlan(title){
-                //vm.plan.createdPlans[title]
 
                 vm.model.currentIndex = 0;
                 element.find('button.searchbtnbox').toggleClass('changed');
@@ -392,8 +407,9 @@ angular.module('app',[
                     $rootScope.$emit('setMarkers',{data:vm.model.data});
                     vm.event.reset();
                     $rootScope.$emit('setCenter',{geolocation:{lat:vm.model.data[0].geometry.location.lat(),lng:vm.model.data[0].geometry.location.lng()}});
+                    vm.model.isZeroData = 2;
                 });
-                //vm.model.data = angular.copy(vm.plan.createdPlans[title]);
+                
             }
         }
     }
@@ -418,7 +434,7 @@ angular.module('app',[
         vm.model = locationService;
         vm.show = true;
         vm.toggle = toggle;
-
+        //collapse and expand the panel
         function toggle(){
             vm.show = !vm.show;
             var button = angular.element('.pane-toggle-button');
@@ -477,6 +493,7 @@ angular.module('app',[
                 getDetailPhotos();
 
             }
+            // return attracton page
             function back(){
                 $state.go('attraction');
                 $rootScope.$emit('setCenter',{geolocation:{lat:scope.model.data[0].geometry.location.lat(),lng:scope.model.data[0].geometry.location.lng()}});
@@ -541,13 +558,12 @@ angular.module('app',[
 })();
 
 //mapCtrl.ctrl.js
+//deal with the map manipulation
 (function(){
     'use strict';
     angular
         .module('app.map')
         .controller('MapController',MapController);
-
-    //var map = new google.maps.Map(document.getElementById('map'),mapOptions);
 
     MapController.$inject = ['$window','locationService','$rootScope','eventService'];
 
@@ -602,8 +618,9 @@ angular.module('app',[
         function setMarkers(map,data){
             setAllMarkers(null);
             vm.markers = [];
-            for(var i = 0;i < data.length;i++){
-                var myLatLng={lat:data[i].geometry.location.lat(),lng:data[i].geometry.location.lng()};
+            data.map(function(result,i)
+            {
+                var myLatLng={lat:result.geometry.location.lat(),lng:result.geometry.location.lng()};
                 var marker = new google.maps.Marker({
                     position:myLatLng,
                 });
@@ -613,15 +630,18 @@ angular.module('app',[
                     };
                 })(i));
                 vm.markers.push(marker);
+            });
 
-            }
+
+
             setAllMarkers(map);
         }
         function setAllMarkers(map){
-            for(var i = 0;i < vm.markers.length;i++)
+            vm.markers.map(function(marker)
             {
-                vm.markers[i].setMap(map);
-            }
+                marker.setMap(map);
+            });
+
         }
         function setAnimation(index){
             vm.markers[index].setAnimation(google.maps.Animation.BOUNCE);
@@ -654,7 +674,7 @@ angular.module('app',[
 })();
 
 //drag.directive.js
-
+// nake a element draggable
 (function(){
     'use strict';
 
@@ -695,6 +715,8 @@ angular.module('app',[
     }
 })();
 
+//drop.directive.js
+// make an element droppable
 (function(){
     'use strict';
 
@@ -768,8 +790,8 @@ angular.module('app',[
         .module('app.plan')
         .directive('newPlan',newPlan);
 
-    newPlan.$inject = ['locationService','planService','permissionService'];
-    function newPlan(locationService,planService,permissionService){
+    newPlan.$inject = ['locationService','planService','permissionService','FlashService'];
+    function newPlan(locationService,planService,permissionService,FlashService){
         var directive ={
             restrict:'E',
             link:link,
@@ -785,7 +807,7 @@ angular.module('app',[
             scope.save = save;
             scope.cancelSelected = cancelSelected;
 
-
+            //cancel the creation operation
             function cancel(){
                 scope.permission.planMode = false;
                 angular.element('.plan-overlay').css('visibility','hidden');
@@ -793,14 +815,19 @@ angular.module('app',[
                 scope.plan.selected = [];
             }
 
+            //remove the selected attractions
             function cancelSelected(id,id2){
                 scope.plan.current[id].isSelected = false;
                 scope.plan.selected.splice(id2,1);
             }
+            //save the selected attractions
             function save(title){
-                if(scope.plan.selected.length === 0 || typeof title === 'undefined' )
+                if(typeof title === 'undefined' && title === '' )
                 {
-                    console.log("ishere");
+                    FlashService.create("the title can't be empty!");
+                }
+                else if(scope.plan.selected.length === 0){
+                    FlashService.create("the content cannot be empty!");
                 }
                 else{
 
@@ -818,7 +845,7 @@ angular.module('app',[
 })();
 
 //plan.factory.js
-
+//used to store the plan infomation
 (function(){
     'use strict';
 
@@ -830,23 +857,24 @@ angular.module('app',[
     function planService(storageService){
 
         var model={
-            current:[],
-            selected:[],
+            current:[],//store the unselected plans
+            selected:[],//Store the selected plans
             save:save,
-            createdPlans:storageService.items,
+            createdPlans:storageService.items, // get the created plans from storageService(Local storage)
             clear:clear
         };
         return model;
-
+        //save the created plan
         function save(title){
             var names = [];
-            for(var i = 0;i < model.selected.length;i++)
-            {
-                names.push(model.selected[i].name);
-            }
+            model.selected.map(function(selected){
+                names.push(selected.name);
+            });
+
+
             storageService.setItem(title,names);
         }
-
+        //clear all the selected plans
         function clear(){
             storageService.clear();
             model.createdPlans = {};
@@ -854,6 +882,8 @@ angular.module('app',[
     }
 })();
 
+//event.factory.js
+//moved the registered rootScope event to event Service to avoid the duplicate event registeration
 (function(){
     'use strict';
     angular
@@ -903,34 +933,37 @@ angular.module('app',[
         return model;
         //use stored the names of attractions in created plan to get results;
         function loadAttraction(names){
-            model.data.splice(0,model.data.length);
+
             model.promises = [];
-            model.defers = [];
+            var newData = [];
             var service = new google.maps.places.PlacesService(model.map);
-            for(var i = 0;i < names.length;i++){
-                model.defers.push($q.defer());
-                model.promises.push(model.defers[i].promise);
+            names.map(function(name)
+            {
+                var defer = $q.defer();
+                model.promises.push(defer.promise);
                 var request = {
-                    query:names[i]
+                    query:name
                 };
 
-                service.textSearch(request,(function(index){
+                service.textSearch(request,(function(defer){
 
                     return function(results,status,pagination){
                         if (status == google.maps.places.PlacesServiceStatus.OK) {
 
-                            model.data.push(results[0]);
+                            newData.push(results[0]);
                             model.pagination = pagination;
-                            model.isZeroData = 2;
-                            model.defers[index].resolve();
+
+                            defer.resolve();
                         }
                         else {
-                            model.defers[index].reject("Can't get the result");
+                            defer.reject("Can't get the result");
                         }
                     };
-                })(i));
-            }
-            return  $q.all(model.promises);
+                })(defer));
+            });
+            return  $q.all(model.promises).then(function(){
+                model.data = newData;
+            });
         }
         /// search Input
         function search(input){
@@ -1052,8 +1085,8 @@ angular.module('app',[
 
     function permissionService(){
         var model ={
-            isAllowed:false,
-            planMode:false,
+            isAllowed:false, //determine if it is allowed to enter the detail route view
+            planMode:false, //decide if it is the planMode
             endHint:false
         };
         return model;
@@ -1061,6 +1094,7 @@ angular.module('app',[
 })();
 
 //storage.factory.js
+//load data from localstorage when the application loaded and store the plan data back to localStorage when the application is unloaded
 (function(){
     'use strict';
 
@@ -1103,9 +1137,7 @@ angular.module('app',[
             return Object.keys(items);
         }
         function setItem(key,value){
-
             items[key] = angular.copy(value);
-
         }
         function getItem(key)
         {
@@ -1130,7 +1162,75 @@ angular.module('app',[
         .value('storageKey',"angularjs_travel_plan");
 })();
 
+//flash.dir.js
+//Flash meassage widget
+(function(){
+    'use strict';
+
+    angular
+        .module('app.widget')
+        .directive('flash',flash);
+    flash.$inject = ['FlashService'];
+    function flash(FlashService)
+    {
+        var dir = {
+
+            restrict:'E',
+            templateUrl:'templates/flash.html',
+            link:link
+
+        };
+        function link(scope){
+            scope.flash = FlashService;
+        }
+        return dir;
+
+    }
+})();
+
+//flashService.factorty.js
+//used to manipulate the flash data
+(function(){
+    'use strict';
+
+    angular
+        .module('app.widget')
+        .factory('FlashService',FlashService);
+
+    FlashService.$inject = ['$timeout','$rootScope'];
+    function FlashService($timeout,$rootScope){
+
+        var dataFactory = {
+            create:create,
+            dismiss:dismiss,
+            flash:{
+                text:'',
+                timeout:5000
+            },
+            hasFlash:false
+        },
+        timeout;
+        function create(text){
+            $timeout.cancel(timeout);
+            dataFactory.flash.text = text;
+
+            dataFactory.hasFlash = true;
+            timeout = $timeout(function(){
+                dataFactory.dismiss();
+            },dataFactory.flash.timeout);
+        }
+        function dismiss() {
+            $timeout.cancel(timeout);
+            $timeout(function() {
+                dataFactory.hasFlash = false;
+            });
+        }
+        return dataFactory;
+    }
+})();
+
 /*imgViewer.dir.js*/
+// image Viewer directive
 (function(){
     'use strict';
 
@@ -1152,8 +1252,7 @@ angular.module('app',[
 
 })();
 
-/*tooltip.js*/
-
+/*tooltip.directive.js*/
 (function(){
     'use strict';
     angular

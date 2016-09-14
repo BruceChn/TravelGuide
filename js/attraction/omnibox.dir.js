@@ -1,12 +1,12 @@
 //omnibox.dir.js
-
+//the searchbox directive
 (function(){
     angular
         .module('app.attraction')
         .directive('omnibox',OmniBox);
 
-    OmniBox.$inject = ['locationService','$rootScope','$filter','$state','eventService','permissionService','planService'];
-    function OmniBox(locationService,$rootScope,$filter,$state,eventService,permissionService,planService){
+    OmniBox.$inject = ['locationService','$rootScope','$filter','$state','eventService','permissionService','planService','FlashService'];
+    function OmniBox(locationService,$rootScope,$filter,$state,eventService,permissionService,planService,FlashService){
         var directive ={
             restrict:'E',
             scope:{},
@@ -29,10 +29,12 @@
             vm.enterPlanMode = enterPlanMode;
             vm.viewPlan = viewPlan;
             vm.clear = clear;
-
+            //search attractions based on input;
             function searchAttraction(input){
-                if(input !== '' && input !== undefined)
+
+                if(typeof input !== 'undefined' && input !== '')
                 {
+
                     vm.model.currentIndex = 0;
                     element.find('button.searchbtnbox').toggleClass('changed');
                     var promise = vm.model.search(input);
@@ -51,7 +53,11 @@
                     });
 
                 }
+                else {
+                    FlashService.create('The input cannot be empty!');
+                }
             }
+            // create new plan mode
             function enterPlanMode(){
                 vm.permission.planMode = true;
                 vm.permission.endHint = false;
@@ -66,13 +72,13 @@
                 angular.element('.plan-overlay').css('visibility','visible');
 
             }
-
+            // clear all existed plans
             function clear(){
                 vm.plan.clear();
 
             }
+            //view selected plans
             function viewPlan(title){
-                //vm.plan.createdPlans[title]
 
                 vm.model.currentIndex = 0;
                 element.find('button.searchbtnbox').toggleClass('changed');
@@ -84,8 +90,9 @@
                     $rootScope.$emit('setMarkers',{data:vm.model.data});
                     vm.event.reset();
                     $rootScope.$emit('setCenter',{geolocation:{lat:vm.model.data[0].geometry.location.lat(),lng:vm.model.data[0].geometry.location.lng()}});
+                    vm.model.isZeroData = 2;
                 });
-                //vm.model.data = angular.copy(vm.plan.createdPlans[title]);
+                
             }
         }
     }

@@ -1,3 +1,5 @@
+//drop.directive.js
+// make an element droppable
 (function(){
     'use strict';
 

@@ -13,7 +13,7 @@
         vm.model = locationService;
         vm.show = true;
         vm.toggle = toggle;
-
+        //collapse and expand the panel
         function toggle(){
             vm.show = !vm.show;
             var button = angular.element('.pane-toggle-button');

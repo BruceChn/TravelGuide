@@ -1,3 +1,5 @@
+//event.factory.js
+//moved the registered rootScope event to event Service to avoid the duplicate event registeration
 (function(){
     'use strict';
     angular

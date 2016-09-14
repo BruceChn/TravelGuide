@@ -1,4 +1,5 @@
 //storage.factory.js
+//load data from localstorage when the application loaded and store the plan data back to localStorage when the application is unloaded
 (function(){
     'use strict';
 
@@ -41,9 +42,7 @@
             return Object.keys(items);
         }
         function setItem(key,value){
-
             items[key] = angular.copy(value);
-
         }
         function getItem(key)
         {

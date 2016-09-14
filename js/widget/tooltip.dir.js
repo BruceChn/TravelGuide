@@ -1,5 +1,4 @@
-/*tooltip.js*/
-
+/*tooltip.directive.js*/
 (function(){
     'use strict';
     angular

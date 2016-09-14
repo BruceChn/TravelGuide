@@ -84,13 +84,17 @@
                     $rootScope.$emit('setMarkers',{data:scope.model.data});
                 }
             }
+            //start the drop animation on certain mark
             function animate(index){
                 $rootScope.$emit('setAnimation',{index:index});
             }
+            //stop the animation
             function stopAnimate(index){
                 $rootScope.$emit('stopAnimation',{index:index});
             }
+            //
             function getDetail(pageIndex,index){
+                //when in new plan mode, enter the detail page is not allowed
                 if(scope.permission.planMode) return;
                 angular.element('button.searchbtnbox').toggleClass('changed');
                 angular.element('div.section-refresh-overlay').css('visibility','visible');
@@ -110,7 +114,7 @@
 
         }
     }
-
+    
     AttractionController.$inject = ['locationService','$http'];
     function AttractionController(locationService,$http){
         var vm = this;

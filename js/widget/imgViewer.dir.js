@@ -1,4 +1,5 @@
 /*imgViewer.dir.js*/
+// image Viewer directive
 (function(){
     'use strict';
 

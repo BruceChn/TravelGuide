@@ -11,8 +11,8 @@
 
     function permissionService(){
         var model ={
-            isAllowed:false,
-            planMode:false,
+            isAllowed:false, //determine if it is allowed to enter the detail route view
+            planMode:false, //decide if it is the planMode
             endHint:false
         };
         return model;

@@ -9,7 +9,8 @@ angular.module('app.core',[
     /*shared service*/
     'app.service'
 ]);
-angular.module('app.widget',[]);
+angular.module('app.widget',['ngAnimate']);
+
 angular.module('app.map',[
     'app.core',
     'app.widget'
