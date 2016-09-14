@@ -38,7 +38,7 @@
             }
             //save the selected attractions
             function save(title){
-                if(typeof title === 'undefined' && title === '' )
+                if(typeof title === 'undefined' || title === '' )
                 {
                     FlashService.create("the title can't be empty!");
                 }
