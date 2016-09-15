@@ -1110,33 +1110,30 @@ angular.module('app',[
             items:items,
             getItem: getItem,
             setItem: setItem,
-            getKeys: getKeys,
             clear:clear
         };
         $window.addEventListener('beforeunload',persistData);
         return model;
 
         function loadData(){
+
             try{
                 if(storageKey in $window.localStorage)
                 {
                     var data = $window.localStorage.getItem(storageKey);
                     $window.localStorage.removeItem(storageKey);
-                    return (angular.extend({},angular.fromJson(data)));
+                     return (angular.extend({},angular.fromJson(data)));
                 }
 
             } catch ( localStorageError ) {
                 $exceptionHandler( localStorageError );
             }
             return ({});
+
         }
         function clear(){
             items = {};
             model.items = items;
-        }
-        function getKeys(){
-
-            return Object.keys(items);
         }
         function setItem(key,value){
             items[key] = angular.copy(value);
